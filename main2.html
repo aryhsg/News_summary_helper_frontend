@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E.D.N. // DESIGN_DASHBOARD</title>
+<!-- 引入更圓潤幾何的字體 Outfit 與 Manrope -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Outfit:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* --- TRENDY PALETTE & GRADIENTS --- */
+    /* Core Background Gradient */
+    --bg-core: #1F1F1F;
+    --grad-core: linear-gradient(135deg, #1F1F1F 0%, #0a0a0a 100%);
+    
+    /* Panel Gradient (Lighter top, darker bottom) */
+    --grad-panel: linear-gradient(180deg, #2E2E2E 0%, #1a1a1a 100%);
+    
+    /* Card Gradient (Subtle depth) */
+    --grad-card: linear-gradient(145deg, #333333 0%, #262626 100%);
+    
+    /* Active/Hover Gradient (Vibrant Orange) */
+    --grad-primary: linear-gradient(135deg, #FF5E14 0%, #FF2E00 100%);
+    
+    /* --- ACCENTS --- */
+    --primary: #FF5E14;       
+    --white: #FFFFFF;
+    --grey-text: #AAAAAA;
+    
+    /* --- SHAPES --- */
+    --radius-lg: 24px;        
+    --radius-md: 16px;        
+    --radius-pill: 100px;     
+    
+    /* --- TYPOGRAPHY --- */
+    --font-head: 'Outfit', sans-serif;
+    --font-body: 'Noto Sans TC', sans-serif;
+    --font-ui: 'Manrope', sans-serif;
+    
+    /* --- Z-INDEX --- */
+    --z-nav: 100;
+    --z-modal: 200;
+    --z-drawer: 150;
+    --z-toggle: 140;
+  }
+
+  /* RESET */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--grad-core); /* Main Gradient */
+    color: var(--white);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    font-size: 15px;
+  }
+
+  /* --- SIDEBAR (Rounded & Clean) --- */
+  .app-sidebar {
+    width: 260px;
+    background: transparent; /* Blend with body gradient */
+    display: flex;
+    flex-direction: column;
+    z-index: var(--z-nav);
+    flex-shrink: 0;
+    padding: 20px;
+  }
+
+  .sidebar-header {
+    padding: 10px 10px 30px 10px;
+  }
+
+  .brand-logo {
+    font-family: var(--font-head);
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .brand-icon {
+    width: 36px; height: 36px;
+    background: var(--grad-primary);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 900; color: #fff;
+    box-shadow: 0 4px 12px rgba(255, 94, 20, 0.3);
+  }
+
+  .nav-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .nav-group-title {
+    padding: 0 16px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--grey-text);
+    margin-bottom: 8px;
+    margin-top: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    color: var(--white);
+    font-family: var(--font-ui);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: var(--radius-pill); 
+    transition: all 0.2s ease;
+  }
+
+  .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--primary);
+  }
+
+  .nav-item.active {
+    background: var(--white);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .nav-item-count {
+    font-size: 12px;
+    opacity: 0.5;
+    background: rgba(0,0,0,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  
+  .nav-item.active .nav-item-count { 
+    opacity: 1; 
+    background: #000; 
+    color: var(--white); 
+  }
+
+  /* --- MAIN CONTENT --- */
+  .app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: var(--grad-panel); /* Gradient Panel */
+    border-radius: 30px 0 0 30px; 
+    box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+    margin: 10px 0 10px 0; 
+    border-left: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* --- TOP BAR --- */
+  .top-bar {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    flex-shrink: 0;
+  }
+
+  .page-title {
+    font-family: var(--font-head);
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    position: relative;
+    background: linear-gradient(90deg, #fff, #aaa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* 標題下的裝飾線條 */
+  .page-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0px; left: 0;
+    width: 100%; height: 6px;
+    background: var(--grad-primary);
+    z-index: -1;
+    opacity: 0.5;
+    border-radius: 4px;
+    transform: rotate(-1deg);
+  }
+
+  .search-wrap {
+    position: relative;
+    width: 320px;
+  }
+
+  .search-wrap input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius-pill);
+    padding: 12px 20px 12px 48px;
+    color: var(--white);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+  }
+
+  .search-wrap input:focus {
+    border-color: var(--primary);
+    background: #000;
+    box-shadow: 0 0 15px rgba(255, 94, 20, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 18px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--grey-text);
+  }
+
+  /* --- GRID CONTENT --- */
+  .content-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  /* --- TRENDY CARD DESIGN --- */
+  .trend-card {
+    background: var(--grad-card); /* Subtle gradient background */
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  /* Hover 效果：變橘色漸層 */
+  .trend-card:hover {
+    background: var(--grad-primary);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(255, 94, 20, 0.25);
+    border-color: transparent;
+  }
+
+  .trend-card:hover .card-title,
+  .trend-card:hover .card-meta {
+    color: #000; /* 反白 */
+  }
+  
+  .trend-card:hover .card-arrow {
+    background: #000;
+    color: var(--primary);
+    transform: rotate(45deg);
+  }
+  
+  .trend-card:hover .card-img img {
+    filter: grayscale(0%);
+    transform: scale(1.1);
+  }
+
+  /* 卡片頭部 */
+  .card-header {
+    padding: 24px 24px 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .card-title {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--white);
+    margin-right: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.3s;
+  }
+
+  .card-arrow {
+    width: 40px; height: 40px;
+    background: var(--white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #000;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .card-img-wrap {
+    margin: 20px 24px 24px 24px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    background: #000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .card-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.5s;
+    filter: grayscale(30%);
+  }
+
+  .card-meta {
+    padding: 0 24px 24px 24px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--grey-text);
+    font-weight: 600;
+    transition: color 0.3s;
+    margin-top: auto;
+  }
+
+  .cat-pill {
+    background: rgba(0,0,0,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* --- SUMMARY BUTTON (Toggle) --- */
+  .summary-toggle {
+    position: fixed;
+    top: 100px; right: 0;
+    background: var(--grad-primary);
+    color: #FFF;
+    padding: 16px 12px;
+    border-radius: 20px 0 0 20px;
+    font-family: var(--font-head);
+    font-weight: 700;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: pointer;
+    z-index: var(--z-toggle);
+    box-shadow: -4px 4px 20px rgba(0,0,0,0.4);
+    border: none;
+    transition: right 0.3s, transform 0.3s, padding 0.3s;
+    display: none; 
+    letter-spacing: 0.1em;
+  }
+  
+  .summary-toggle.visible { display: flex; align-items: center; gap: 8px; }
+  .summary-toggle:hover { padding-right: 20px; box-shadow: -4px 4px 25px rgba(255, 94, 20, 0.4); }
+
+  /* --- DRAWER (Right Side Panel) --- */
+  .summary-drawer {
+    position: fixed;
+    top: 10px; bottom: 10px; right: 10px;
+    width: 500px; 
+    background: var(--grad-panel); /* Uses panel gradient */
+    border-radius: 30px;
+    z-index: var(--z-drawer);
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: -30px 0 80px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .summary-drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    padding: 24px 30px;
+    background: rgba(0,0,0,0.2);
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .drawer-title {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--white);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .drawer-close {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: 0.2s;
+  }
+  .drawer-close:hover { background: var(--primary); color: #000; }
+
+  .drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, transparent 100%);
+  }
+
+  /* 摘要內容區塊樣式 */
+  .summary-box {
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+  
+  .summary-label {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .summary-text {
+    line-height: 1.8;
+    color: #DDD;
+    font-size: 16px;
+  }
+
+  /* --- MODAL (UPDATED for Split View) --- */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); /* Slightly darker */
+    backdrop-filter: blur(12px);
+    z-index: var(--z-modal);
+    display: none;
+    /* Use flex to handle side-by-side */
+    display: none; /* Changed via JS to flex */
+    justify-content: center; 
+    align-items: center;
+    padding: 20px;
+    gap: 20px; /* Space between modal and summary popup */
+    opacity: 0; transition: opacity 0.3s;
+    overflow-x: auto; /* Handle wide content */
+  }
+  .modal-overlay.active { display: flex; opacity: 1; }
+
+  /* Main Article Modal */
+  .modal-card {
+    background: #1a1a1a;
+    width: 800px; max-width: 50vw; /* Adjust for side-by-side */
+    height: 85vh;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    transition: width 0.3s ease;
+  }
+
+  .modal-header {
+    padding: 24px 32px;
+    background: linear-gradient(180deg, #252525 0%, #1a1a1a 100%);
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  
+  .modal-cat-badge {
+    background: var(--grad-primary);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(255, 94, 20, 0.3);
+  }
+
+  .modal-title {
+    font-family: var(--font-head);
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .modal-img {
+    width: 100%; height: 350px; object-fit: cover;
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  }
+
+  .modal-content {
+    padding: 20px 40px 40px 40px;
+    font-size: 18px;
+    line-height: 1.8;
+    color: #CCC;
+    max-width: 800px; margin: 0 auto;
+  }
+
+  /* [UPDATED] 新增對 HTML 標籤 (如 p) 的樣式支援 
+    確保 API 回傳的 HTML 文章排版正確
+  */
+  .modal-content p {
+    margin-bottom: 24px; /* 段落間距 */
+    text-align: justify; /* 左右對齊 */
+  }
+
+  .modal-footer {
+    padding: 20px 32px;
+    background: #151515;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex; justify-content: flex-end;
+  }
+
+  .btn-primary {
+    background: var(--white);
+    color: #000;
+    border: none;
+    padding: 14px 28px;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--grad-primary);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 94, 20, 0.4);
+  }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* --- NEW INDEPENDENT SUMMARY POPUP --- */
+  .summary-popup {
+    background: #222; /* Slightly different shade */
+    width: 450px; 
+    height: 85vh; /* Match modal height */
+    border-radius: 30px;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    border: 1px solid var(--primary); /* Highlight border */
+    box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+    flex-shrink: 0;
+    animation: slideInRight 0.4s cubic-bezier(0.19, 1, 0.22, 1) both;
+  }
+
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .popup-header {
+    padding: 20px 24px;
+    background: rgba(255, 94, 20, 0.1);
+    border-bottom: 1px solid var(--primary);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .popup-title {
+    font-family: var(--font-head);
+    font-weight: 800;
+    color: var(--primary);
+    font-size: 18px;
+    letter-spacing: 0.05em;
+  }
+
+  .popup-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    font-size: 16px;
+    line-height: 1.8;
+    color: #EEE;
+  }
+
+  /* --- LOADING --- */
+  .loader {
+    width: 48px; height: 48px;
+    border: 5px solid #FFF;
+    border-bottom-color: var(--primary);
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+  }
+  @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* --- RESPONSIVE --- */
+  @media (max-width: 1200px) {
+    .modal-card { width: 60%; }
+    .summary-popup { width: 35%; }
+  }
+
+  @media (max-width: 768px) {
+    body { flex-direction: column; height: auto; overflow: auto; }
+    .app-sidebar { width: 100%; padding: 10px; background: #1a1a1a; z-index: 100; position: sticky; top:0; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+    .nav-scroll { flex-direction: row; overflow-x: auto; padding-bottom: 10px; gap: 10px; }
+    .nav-item { width: auto; white-space: nowrap; padding: 8px 16px; font-size: 14px; background: rgba(255,255,255,0.1); }
+    .nav-group-title { display: none; }
+    
+    .app-main { margin: 0; border-radius: 0; border-top-left-radius: 20px; border-top-right-radius: 20px; overflow: visible; }
+    .top-bar { padding: 20px; flex-direction: column; align-items: flex-start; height: auto; gap: 16px; }
+    .search-wrap { width: 100%; }
+    .content-scroll { padding: 20px; overflow: visible; }
+    
+    .summary-toggle { top: auto; bottom: 30px; border-radius: 20px; writing-mode: horizontal-tb; padding: 12px 20px; right: 20px; }
+    .summary-drawer { width: 100%; top: 20px; bottom: 0; right: 0; border-radius: 20px 20px 0 0; transform: translateY(100%); }
+    .summary-drawer.open { transform: translateY(0); }
+
+    .modal-overlay { flex-direction: column; justify-content: flex-start; padding: 10px; }
+    .modal-card { width: 100%; max-width: 100%; height: auto; max-height: 60vh; }
+    .summary-popup { width: 100%; height: auto; max-height: 40vh; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="app-sidebar">
+  <div class="sidebar-header">
+    <div class="brand-logo">
+      <div class="brand-icon">E</div>
+      <div>E.D.N.</div>
+    </div>
+  </div>
+  
+  <div class="nav-scroll" id="navContainer">
+    <!-- Nav Items Injected Here -->
+  </div>
+</nav>
+
+<main class="app-main">
+  <div class="top-bar">
+    <div class="page-title" id="pageTitle">DASHBOARD</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search news...">
+    </div>
+  </div>
+
+  <div class="content-scroll">
+    <div class="news-grid" id="newsGrid">
+      <!-- Cards Injected Here -->
+    </div>
+  </div>
+</main>
+
+<!-- Right Side Summary Button -->
+<button class="summary-toggle" id="summaryToggle">
+  <span>SUMMARY</span> ➔
+</button>
+
+<!-- Summary Drawer (Category Level) -->
+<div class="summary-drawer" id="summaryDrawer">
+  <div class="drawer-header">
+    <div class="drawer-title">
+      <span style="color:var(--primary);">●</span> SECTOR SUMMARY
+    </div>
+    <button class="drawer-close" id="drawerClose">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerContent">
+    <!-- Summary Content -->
+  </div>
+</div>
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="modalOverlay">
+  <!-- Article Card -->
+  <div class="modal-card" id="modalCard">
+    <div class="modal-header">
+      <div style="flex:1;">
+        <span class="modal-cat-badge" id="modalCat">CATEGORY</span>
+        <div class="modal-title" id="modalTitle">Title</div>
+      </div>
+      <button class="drawer-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- Content -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-primary" id="btnSummarize">GENERATE AI REPORT</button>
+    </div>
+  </div>
+
+  <!-- Independent Summary Popup -->
+  <div class="summary-popup" id="summaryPopup">
+    <div class="popup-header">
+      <span style="font-size:20px;">⚡</span>
+      <span class="popup-title">AI INTELLIGENCE</span>
+    </div>
+    <div class="popup-body" id="summaryPopupBody">
+      <!-- Generated Summary Goes Here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'https://newsbot.aryhsg.com';
+  
+  const CATEGORIES = [
+    '要聞','國際','證券','期貨','理財','房市',
+    '兩岸','金融','專欄','專題','商情','產業'
+  ];
+
+  let allNews = [];
+  let currentCategory = '';
+  let searchQuery = '';
+  let currentNews = null;
+
+  // Init
+  function init() {
+    renderSidebar();
+    fetchNewsList();
+    setupEvents();
+  }
+
+  function renderSidebar() {
+    const container = document.getElementById('navContainer');
+    let html = `
+      <div class="nav-group-title">Menu</div>
+      <button class="nav-item active" onclick="setCategory('')" id="nav-all">
+        <span>All News</span>
+        <span class="nav-item-count" id="cnt-all">0</span>
+      </button>
+      <div class="nav-group-title">Categories</div>
+    `;
+    
+    CATEGORIES.forEach(cat => {
+      html += `
+        <button class="nav-item" onclick="setCategory('${cat}')" id="nav-${cat}">
+          <span>${cat}</span>
+          <span class="nav-item-count" id="cnt-${cat}">0</span>
+        </button>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+  async function fetchNewsList() {
+    const grid = document.getElementById('newsGrid');
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;"><span class="loader"></span></div>';
+    
+    try {
+      const res = await fetch(`${API_BASE}/api/news`);
+      if(!res.ok) throw new Error();
+      allNews = await res.json();
+      updateCounts();
+      renderGrid(allNews); // 預設使用全域資料渲染
+    } catch(e) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;">Failed to load data.</div>';
+    }
+  }
+
+  function updateCounts() {
+    document.getElementById('cnt-all').innerText = allNews.length;
+    CATEGORIES.forEach(cat => {
+      const cnt = allNews.filter(n => n.category === cat).length;
+      document.getElementById(`cnt-${cat}`).innerText = cnt;
+    });
+  }
+
+  function renderGrid(dataSource) {
+    const grid = document.getElementById('newsGrid');
+    const filtered = (dataSource || allNews).filter(n => {
+      // 若使用後端搜尋，這裡的 category filter 可以保留作為二次篩選，
+      // 或由後端直接處理。此處邏輯假設 dataSource 已經是初步篩選過的結果 (如後端搜尋結果)
+      const matchCat = !currentCategory || n.category === currentCategory;
+      // 若是前端搜尋，則需比對 keyword；若是後端搜尋回傳的結果，則通常無需再比對 keyword
+      // 這裡保留彈性：如果 dataSource 是 allNews (前端搜尋情境)，則比對標題
+      const matchSearch = (dataSource === allNews && searchQuery) 
+        ? n.title.includes(searchQuery) 
+        : true;
+        
+      return matchCat && matchSearch;
+    });
+
+    document.getElementById('pageTitle').innerText = currentCategory ? currentCategory : 'DASHBOARD';
+
+    if(filtered.length === 0) {
+      // 根據需求變更為「目前尚無新聞」
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:#666;">目前尚無新聞</div>';
+      return;
+    }
+
+    grid.innerHTML = filtered.map(news => {
+      const img = news.img || '';
+      const fallback = `<div style="width:100%;height:100%;background:#222;display:flex;align-items:center;justify-content:center;color:#444;font-weight:900;font-size:30px;">${news.category[0]}</div>`;
+      const imgHtml = img ? `<img src="${esc(img)}" onerror="this.parentElement.innerHTML='${esc(fallback)}'">` : fallback;
+
+      return `
+        <div class="trend-card" onclick="openModal(${news.id})">
+          <div class="card-header">
+            <div class="card-title">${esc(news.title)}</div>
+            <div class="card-arrow">➔</div>
+          </div>
+          <div class="card-img-wrap">
+            ${imgHtml}
+          </div>
+          <div class="card-meta">
+            <span class="cat-pill">${news.category}</span>
+            <span>ID: ${news.id}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // --- ACTIONS ---
+  window.setCategory = function(cat) {
+    currentCategory = cat;
+    
+    // [UPDATED] 清空搜尋狀態
+    searchQuery = '';
+    document.getElementById('searchInput').value = '';
+
+    // Sidebar active state
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    if(cat === '') document.getElementById('nav-all').classList.add('active');
+    else document.getElementById(`nav-${cat}`).classList.add('active');
+
+    // Toggle Button visibility
+    const toggle = document.getElementById('summaryToggle');
+    if(cat === '') {
+      toggle.classList.remove('visible');
+      closeDrawer();
+    } else {
+      toggle.classList.add('visible');
+      updateDrawerContent(cat);
+    }
+
+    // [UPDATED] 強制重新渲染完整列表 (忽略之前的搜尋結果)
+    renderGrid(allNews);
+  };
+
+  // -----------------------------------------------------
+  // API: 類別摘要 (Category Summary)
+  // -----------------------------------------------------
+  /*
+    [API 規格說明]
+    - URL: /api/news/summary/category
+    - Method: POST
+    - Headers: 'Content-Type': 'application/json'
+    - Body: { "category": "類別名稱" }
+    - Response (JSON):
+      {
+        "summary": "AI 生成的該類別重點摘要內容...",
+        "status": "success" (選填)
+      }
+  */
+  async function updateDrawerContent(cat) {
+    const content = document.getElementById('drawerContent');
+    
+    // 1. Loading State
+    content.innerHTML = `
+      <div style="text-align:center; padding:40px;">
+        <span class="loader"></span>
+        <div style="margin-top:16px; color:#888;">Analyzing ${esc(cat)} news...</div>
+      </div>
+    `;
+
+    try {
+      // 2. API Call
+      const res = await fetch(`${API_BASE}/api/news/summary/category`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category: cat })
+      });
+
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      const summaryText = data.summary || "暫無摘要資料";
+
+      // 3. Render Content
+      content.innerHTML = `
+        <div class="summary-box" style="border:1px solid var(--primary); background:rgba(255,94,20,0.05);">
+          <span class="summary-label">AI Analysis Report</span>
+          <div class="summary-text">${esc(summaryText)}</div>
+        </div>
+        
+        <div class="summary-box">
+          <span class="summary-label">Category Stats</span>
+          <div class="summary-text">
+            Total Articles: <strong>${allNews.filter(n=>n.category===cat).length}</strong><br>
+            Status: <strong>Live</strong>
+          </div>
+        </div>
+      `;
+    } catch (e) {
+      content.innerHTML = `
+        <div class="summary-box" style="border-color:#555;">
+          <span class="summary-label">System Message</span>
+          <div class="summary-text" style="color:#aaa;">
+            目前無法取得摘要。<br>可能是 API 尚未連線或該類別資料不足。
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  const drawer = document.getElementById('summaryDrawer');
+  const toggleBtn = document.getElementById('summaryToggle');
+  
+  toggleBtn.onclick = () => drawer.classList.add('open');
+  document.getElementById('drawerClose').onclick = closeDrawer;
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+  }
+
+  // --- MODAL ---
+  window.openModal = async function(id) {
+    const news = allNews.find(n => n.id === id);
+    if(!news) return;
+    currentNews = news;
+
+    const overlay = document.getElementById('modalOverlay');
+    const body = document.getElementById('modalBody');
+    const btn = document.getElementById('btnSummarize');
+    const summaryPopup = document.getElementById('summaryPopup');
+    
+    // Reset Button & Popup
+    btn.innerText = 'GENERATE AI REPORT';
+    btn.disabled = false;
+    summaryPopup.style.display = 'none';
+    
+    document.getElementById('modalTitle').innerText = news.title;
+    document.getElementById('modalCat').innerText = news.category;
+    
+    body.innerHTML = '<div style="text-align:center;padding:50px;"><span class="loader"></span></div>';
+    overlay.classList.add('active');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/news/${id}`);
+      const data = await res.json();
+      
+      const imgHtml = data.img ? `<img class="modal-img" src="${esc(data.img)}">` : '';
+      
+      // [UPDATED] Use HTML rendering for content (no esc())
+      // Assuming data.content contains safe HTML like <p>...</p>
+      body.innerHTML = `
+        ${imgHtml}
+        <div class="modal-content">
+          ${data.content || 'Content unavailable.'}
+        </div>
+      `;
+    } catch(e) {
+      body.innerHTML = '<div style="padding:40px;text-align:center;">Error loading content.</div>';
+    }
+  }
+
+  document.getElementById('modalClose').onclick = () => {
+    document.getElementById('modalOverlay').classList.remove('active');
+  };
+  
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') {
+      document.getElementById('modalOverlay').classList.remove('active');
+      closeDrawer();
+    }
+  });
+
+  // -----------------------------------------------------
+  // API: 關鍵字搜尋 (Keyword Search)
+  // -----------------------------------------------------
+  /*
+    [API 規格說明]
+    - URL: /api/news/search?q={keyword}
+    - Method: GET
+    - Params: q (string) - 使用者輸入的關鍵字
+    - Response (JSON Array): 回傳符合關鍵字的新聞列表，結構與 /api/news 相同
+      [
+        {
+          "id": 1,
+          "title": "新聞標題",
+          "category": "類別",
+          "img": "圖片URL (可選)",
+          "content": "內容..."
+        },
+        ...
+      ]
+    - Behavior: 
+      1. 若有符合資料：回傳新聞物件陣列。
+      2. 若無符合資料：回傳空陣列 []。
+  */
+  let timer;
+  document.getElementById('searchInput').addEventListener('input', (e) => {
+    clearTimeout(timer);
+    const query = e.target.value.trim();
+    searchQuery = query;
+
+    timer = setTimeout(async () => {
+      // 邏輯判斷：若有輸入關鍵字，使用後端搜尋 API
+      if (query.length > 0) {
+        const grid = document.getElementById('newsGrid');
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;"><span class="loader"></span></div>';
+        
+        try {
+          const res = await fetch(`${API_BASE}/api/news/search?q=${encodeURIComponent(query)}`);
+          if (!res.ok) throw new Error('Search API Error');
+          const searchResults = await res.json();
+          // 使用搜尋結果渲染網格 (若無結果會顯示"目前尚無新聞")
+          renderGrid(searchResults);
+        } catch (error) {
+          // 若 API 失敗，可 fallback 到前端過濾，或顯示錯誤
+          console.warn('Search API failed, falling back to client filter', error);
+          renderGrid(allNews); 
+        }
+      } else {
+        // 若清空搜尋，恢復顯示全部
+        renderGrid(allNews);
+      }
+    }, 500); // Debounce 500ms
+  });
+
+  // -----------------------------------------------------
+  // API: 單篇新聞摘要 (Single News Summary)
+  // -----------------------------------------------------
+  /*
+    [API 規格說明]
+    - URL: /api/news/{id}/summary
+    - Method: POST
+    - Response (JSON):
+      {
+        "id": "新聞ID",
+        "summary": "摘要內容..."
+      }
+  */
+  document.getElementById('btnSummarize').onclick = async function() {
+    if(!currentNews) return;
+    
+    const btn = this;
+    const originalText = btn.innerText;
+    
+    btn.innerText = 'GENERATING SUMMARY...';
+    btn.disabled = true;
+
+    try {
+      const response = await fetch(`${API_BASE}/api/news/${currentNews.id}/summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!response.ok) throw new Error('API Error');
+
+      const data = await response.json();
+      const summaryText = data.summary || data.text || "Summary generated successfully.";
+
+      const summaryPopup = document.getElementById('summaryPopup');
+      const summaryBody = document.getElementById('summaryPopupBody');
+      
+      summaryBody.innerHTML = `<p>${esc(summaryText)}</p>`;
+      summaryPopup.style.display = 'flex';
+      
+      btn.innerText = 'REPORT GENERATED';
+
+    } catch (error) {
+      console.error('Summary Generation Failed:', error);
+      btn.innerText = 'GENERATION FAILED';
+      btn.disabled = false;
+      setTimeout(() => btn.innerText = originalText, 2000);
+    }
+  };
+  
+  function setupEvents() {
+      // already setup above in script flow
+  }
+
+  function esc(s) {
+    return s ? s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+  }
+
+  init();
+</script>
+</body>
+</html>
