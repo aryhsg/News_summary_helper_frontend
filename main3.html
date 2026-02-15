@@ -887,19 +887,17 @@
     renderGrid(allNews);
   };
 
-  // -----------------------------------------------------
+// -----------------------------------------------------
   // API: 類別摘要 (Category Summary)
   // -----------------------------------------------------
   /*
     [API 規格說明]
-    - URL: /api/news/summary/category
+    - URL: /api/news/summary/{category}
     - Method: POST
-    - Headers: 'Content-Type': 'application/json'
-    - Body: { "category": "類別名稱" }
     - Response (JSON):
       {
-        "summary": "AI 生成的該類別重點摘要內容...",
-        "status": "success" (選填)
+        "category": "類別名稱",
+        "summary": "AI 生成的該類別重點摘要內容..."
       }
   */
   async function updateDrawerContent(cat) {
@@ -914,11 +912,12 @@
     `;
 
     try {
-      // 2. API Call
-      const res = await fetch(`${API_BASE}/api/news/summary/category`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ category: cat })
+      // 2. API Call - [UPDATED URL Structure]
+      // Use URL path parameter: /api/news/summary/{category}
+      const res = await fetch(`${API_BASE}/api/news/summary/${encodeURIComponent(cat)}`, {
+        method: 'POST', // Still using POST as per user pref/backend gen action
+        headers: { 'Content-Type': 'application/json' }
+        // Body removed as category is in URL
       });
 
       if (!res.ok) throw new Error('API Error');
@@ -929,7 +928,7 @@
       content.innerHTML = `
         <div class="summary-box" style="border:1px solid var(--primary); background:rgba(255,94,20,0.05);">
           <span class="summary-label">AI Analysis Report</span>
-          <div class="summary-text">${esc(summaryText)}</div>
+          <div class="summary-text">${summaryText}</div>
         </div>
         
         <div class="summary-box">
