@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>E.D.N. // DESIGN_DASHBOARD</title>
+<!-- 引入更圓潤幾何的字體 Outfit 與 Manrope -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Outfit:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -18,7 +19,7 @@
     --primary: #FF5E14;       
     --white: #FFFFFF;
     --grey-text: #AAAAAA;
-    --line-green: #06C755; /* LINE Brand Color */
+    --line-green: #00C300; 
     
     /* --- SHAPES --- */
     --radius-lg: 24px;        
@@ -35,6 +36,7 @@
     --z-modal: 200;
     --z-drawer: 150;
     --z-toggle: 140;
+    --z-toast: 1000;
   }
 
   /* RESET */
@@ -58,7 +60,7 @@
 
   /* --- SIDEBAR --- */
   .app-sidebar {
-    width: 260px;
+    width: 300px; /* 增加寬度讓按鈕與捲軸有足夠空間 */
     background: transparent;
     display: flex;
     flex-direction: column;
@@ -67,28 +69,56 @@
     padding: 20px;
   }
 
-  .sidebar-header {
-    padding: 10px 10px 30px 10px;
-  }
+  .sidebar-header { padding: 10px 10px 30px 10px; }
 
   .brand-logo {
-    font-family: var(--font-head);
-    font-weight: 900;
-    font-size: 24px;
-    letter-spacing: -0.02em;
     display: flex;
     align-items: center;
     gap: 12px;
   }
   
   .brand-icon {
-    width: 36px; height: 36px;
+    width: 56px; height: 56px;
     background: var(--grad-primary);
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 900; color: #fff;
-    box-shadow: 0 4px 12px rgba(255, 94, 20, 0.3);
+    font-size: 16px; font-weight: 900; color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 94, 20, 0.3);
+    font-family: var(--font-head);
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
   }
+
+  .brand-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .brand-title {
+    font-family: var(--font-ui);
+    font-weight: 900;
+    font-size: 15.5px;
+    color: #c91306;
+    line-height: 1.1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .brand-subtitle {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(var(--grad-primary));
+    text-align: left;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
 
   .nav-scroll {
     flex: 1;
@@ -96,6 +126,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-right: 12px; /* 避免按鈕右側光暈與捲軸重疊 */
   }
 
   .nav-group-title {
@@ -114,7 +145,7 @@
     width: 100%;
     text-align: left;
     background: transparent;
-    border: none;
+    border: 1px solid transparent;
     padding: 12px 20px;
     color: var(--white);
     font-family: var(--font-ui);
@@ -124,19 +155,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-radius: var(--radius-pill); 
-    transition: all 0.2s ease;
+    border-radius: 12px; /* 改為長方形但四角圓潤 */
+    transition: all 0.3s ease;
   }
 
   .nav-item:hover {
     background: rgba(255, 255, 255, 0.05);
-    color: var(--primary);
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
   .nav-item.active {
-    background: var(--white);
-    color: #000;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    background: linear-gradient(180deg, rgba(255, 150, 0, 0.05) 0%, rgba(255, 94, 20, 0.15) 100%);
+    color: var(--white);
+    border: 1px solid rgba(255, 150, 0, 0.4); /* 統一四邊的邊框 */
+    box-shadow: 0 0 16px rgba(255, 150, 0, 0.3); /* 偏移量設為0，讓四邊都有均勻、柔和的橘色光暈陰影 */
   }
 
   .nav-item-count {
@@ -144,13 +176,36 @@
     opacity: 0.5;
     background: rgba(0,0,0,0.2);
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 8px; /* 配合按鈕形狀，數字標籤的圓角也稍微收斂 */
+    transition: all 0.3s;
   }
   
   .nav-item.active .nav-item-count { 
     opacity: 1; 
-    background: #000; 
+    background: var(--primary); 
     color: var(--white); 
+    box-shadow: 0 2px 8px rgba(255, 94, 20, 0.4);
+  }
+  
+  /* Highlight styling for Saved category */
+  .nav-item.highlight {
+    color: #ffd700;
+    border: 1px dashed rgba(255, 215, 0, 0.4);
+  }
+  .nav-item.highlight:hover { 
+    background: rgba(255, 215, 0, 0.05); 
+    border-style: solid; 
+  }
+  .nav-item.highlight.active { 
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 215, 0, 0.15) 100%);
+    color: #ffd700; 
+    border: 1px solid rgba(255, 215, 0, 0.4); /* 統一四邊的邊框 */
+    box-shadow: 0 0 16px rgba(255, 215, 0, 0.3); /* 偏移量設為0，讓四邊都有均勻的黃色光暈陰影 */
+  }
+  .nav-item.highlight.active .nav-item-count {
+    background: #ffd700;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
   }
 
   /* --- MAIN CONTENT --- */
@@ -187,6 +242,7 @@
     background: linear-gradient(90deg, #fff, #aaa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
   }
   
   .page-title::after {
@@ -201,14 +257,12 @@
     transform: rotate(-1deg);
   }
 
-  /* [NEW] Header Actions Group */
   .header-actions {
     display: flex;
     align-items: center;
     gap: 16px;
   }
 
-  /* [NEW] LINE Button Style */
   .btn-line {
     background: var(--line-green);
     color: #FFF;
@@ -232,11 +286,7 @@
     background: #05B34C;
   }
 
-  .btn-line svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
-  }
+  .btn-line svg { width: 18px; height: 18px; fill: currentColor; }
 
   .search-wrap {
     position: relative;
@@ -298,27 +348,29 @@
   }
 
   .trend-card:hover {
-    background: var(--grad-primary);
+    /* 改成跟按鈕一樣的橘黃色微光漸層背景 */
+    background: linear-gradient(180deg, rgba(255, 150, 0, 0.05) 0%, rgba(255, 94, 20, 0.15) 100%);
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(255, 94, 20, 0.25);
-    border-color: transparent;
+    /* 橘黃色光暈陰影 */
+    box-shadow: 0 12px 32px rgba(255, 150, 0, 0.25);
+    /* 橘黃色邊框發光 */
+    border-color: rgba(255, 150, 0, 0.4);
   }
 
-  .trend-card:hover .card-title,
-  .trend-card:hover .card-meta {
-    color: #000;
-  }
-  
-  .trend-card:hover .card-arrow {
-    background: #000;
+  /* 滑鼠移上去時，標題微微變橘色增加層次，不再變全黑 */
+  .trend-card:hover .card-title {
     color: var(--primary);
-    transform: rotate(45deg);
   }
   
-  .trend-card:hover .card-img img {
-    filter: grayscale(0%);
-    transform: scale(1.1);
+  /* 箭頭改為橘色底、白色箭頭 */
+  .trend-card:hover .card-arrow {
+    background: var(--primary);
+    color: #FFF;
+    transform: rotate(45deg);
+    box-shadow: 0 4px 15px rgba(255, 94, 20, 0.4);
   }
+  
+  .trend-card:hover .card-img img { filter: grayscale(0%); transform: scale(1.1); }
 
   .card-header {
     padding: 24px 24px 0 24px;
@@ -360,6 +412,7 @@
     aspect-ratio: 16/9;
     background: #000;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: relative;
   }
 
   .card-img-wrap img {
@@ -368,10 +421,34 @@
     filter: grayscale(30%);
   }
 
+  /* SVG Bookmark Icon perfectly centered */
+  .card-bookmark {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #FFF;
+    padding: 0;
+    line-height: normal;
+  }
+  .card-bookmark svg {
+    width: 16px; height: 16px;
+    fill: none; stroke: currentColor; stroke-width: 2;
+    transition: fill 0.2s, stroke 0.2s;
+  }
+  .card-bookmark:hover { background: var(--white); color: #000; border-color: var(--white); }
+  
+  .card-bookmark.saved { color: #ffd700; border-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+  .card-bookmark.saved svg { fill: #ffd700; stroke: #ffd700; }
+  
   .card-meta {
     padding: 0 24px 24px 24px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-family: var(--font-ui);
     font-size: 13px;
     color: var(--grey-text);
@@ -520,6 +597,21 @@
     transition: width 0.3s ease;
   }
 
+  .progress-container {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+    z-index: 50;
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--primary);
+    transition: width 0.1s ease;
+    box-shadow: 0 0 10px var(--primary);
+  }
+
   .modal-header {
     padding: 24px 32px;
     background: linear-gradient(180deg, #252525 0%, #1a1a1a 100%);
@@ -550,6 +642,7 @@
     flex: 1;
     overflow-y: auto;
     padding: 0;
+    position: relative; 
   }
 
   .modal-img {
@@ -597,6 +690,35 @@
   }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* Modal / Global Icon Buttons */
+  .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .icon-btn svg {
+    width: 16px; height: 16px;
+    fill: none; stroke: currentColor; stroke-width: 2;
+  }
+  .icon-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+  .icon-btn.playing { background: var(--primary); color: #000; box-shadow: 0 0 15px rgba(255,94,20,0.5); animation: pulse 1.5s infinite; }
+  
+  .icon-btn.saved { color: #ffd700; border-color: #ffd700; background: rgba(255, 215, 0, 0.1); }
+  .icon-btn.saved svg { fill: #ffd700; stroke: #ffd700; }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+
   /* --- INDEPENDENT SUMMARY POPUP --- */
   .summary-popup {
     background: #222; 
@@ -620,7 +742,7 @@
     padding: 20px 24px;
     background: rgba(255, 94, 20, 0.1);
     border-bottom: 1px solid var(--primary);
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; justify-content: space-between;
   }
 
   .popup-title {
@@ -629,6 +751,7 @@
     color: var(--primary);
     font-size: 18px;
     letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 8px;
   }
 
   .popup-body {
@@ -640,116 +763,97 @@
     color: #EEE;
   }
 
-  .popup-body ul, .popup-body ol {
-    padding-left: 20px;
-    margin-bottom: 16px;
-  }
-  .popup-body li {
-    margin-bottom: 8px;
-  }
+  .popup-body ul, .popup-body ol { padding-left: 20px; margin-bottom: 16px; }
+  .popup-body li { margin-bottom: 8px; }
 
-  /* --- [NEW] LINE MODAL --- */
-  .line-modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(8px);
-    z-index: 300; /* Higher than normal modals */
-    display: none;
-    justify-content: center; 
-    align-items: center;
+  /* --- [NEW] CUSTOM iOS STYLE SHARE SHEET --- */
+  .share-sheet-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+    z-index: 400; display: none; align-items: flex-end; justify-content: center;
     opacity: 0; transition: opacity 0.3s;
-    padding: 20px;
   }
+  .share-sheet-overlay.active { display: flex; opacity: 1; }
+  .share-sheet {
+    background: #252525; width: 100%; max-width: 500px;
+    border-radius: 24px 24px 0 0; padding: 30px 24px 40px 24px;
+    transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  }
+  .share-sheet-overlay.active .share-sheet { transform: translateY(0); }
   
-  .line-modal-overlay.active {
-    display: flex; opacity: 1;
+  .share-sheet-title { text-align: center; color: #aaa; font-size: 14px; margin-bottom: 24px; font-weight: 700; }
+  .share-apps { display: flex; gap: 24px; overflow-x: auto; padding-bottom: 10px; justify-content: flex-start; }
+  @media (min-width: 500px) { .share-apps { justify-content: center; } }
+
+  .share-app-btn { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; border: none; background: none; color: #fff; min-width: 64px; }
+  .share-app-btn:hover .share-app-icon { transform: scale(1.05); }
+  .share-app-icon {
+    width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
+  .share-app-btn span { font-size: 13px; font-weight: 500; font-family: var(--font-ui); }
+  
+  .bg-line-share { background: #06C755; color: #fff; }
+  .bg-fb { background: #1877F2; color: #fff; }
+  .bg-x { background: #000; border: 1px solid #333; color: #fff; }
+  .bg-copy { background: #444; color: #fff; }
+  
+  .share-cancel {
+    width: 100%; background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 16px;
+    padding: 16px; margin-top: 30px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s;
+  }
+  .share-cancel:hover { background: rgba(255,255,255,0.2); }
+
+  /* --- LINE MODAL --- */
+  .line-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    z-index: 300; display: none; justify-content: center; align-items: center;
+    opacity: 0; transition: opacity 0.3s; padding: 20px;
+  }
+  .line-modal-overlay.active { display: flex; opacity: 1; }
 
   .line-card {
-    background: #1a1a1a;
-    width: 100%; max-width: 420px;
-    border-radius: 30px;
-    overflow: hidden;
-    box-shadow: 0 30px 100px rgba(6, 199, 85, 0.2);
-    border: 1px solid rgba(6, 199, 85, 0.3);
-    position: relative;
-    text-align: center;
-    animation: scaleUp 0.4s cubic-bezier(0.19, 1, 0.22, 1) both;
+    background: #1a1a1a; width: 100%; max-width: 420px; border-radius: 30px;
+    overflow: hidden; box-shadow: 0 30px 100px rgba(6, 199, 85, 0.2);
+    border: 1px solid rgba(6, 199, 85, 0.3); position: relative; text-align: center;
   }
 
-  @keyframes scaleUp {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  .line-header {
-    background: var(--line-green);
-    color: white;
-    padding: 30px 20px;
-    border-radius: 0 0 50% 50% / 20px;
-  }
-
-  .line-header svg {
-    width: 48px; height: 48px;
-    margin-bottom: 10px;
-    fill: currentColor;
-  }
-
-  .line-header h2 {
-    font-family: var(--font-head);
-    font-size: 24px;
-    font-weight: 800;
-  }
-
-  .line-body {
-    padding: 30px;
-  }
-
-  .line-body p {
-    color: #CCC;
-    font-size: 15px;
-    line-height: 1.6;
-    margin-bottom: 24px;
-  }
-
-  .qr-box {
-    background: white;
-    padding: 16px;
-    border-radius: 20px;
-    display: inline-block;
-    margin-bottom: 10px;
-  }
-
-  .qr-box img {
-    display: block;
-    width: 180px;
-    height: 180px;
-    background: #f0f0f0; /* Placeholder color */
-    border-radius: 10px;
-  }
-
-  .line-close {
-    position: absolute;
-    top: 20px; right: 20px;
-    background: rgba(0,0,0,0.2);
-    border: none; color: white;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 16px;
-    transition: 0.2s;
-  }
+  .line-header { background: var(--line-green); color: white; padding: 30px 20px; border-radius: 0 0 50% 50% / 20px; }
+  .line-header svg { width: 48px; height: 48px; margin-bottom: 10px; fill: currentColor; }
+  .line-header h2 { font-family: var(--font-head); font-size: 24px; font-weight: 800; }
+  .line-body { padding: 30px; }
+  .line-body p { color: #CCC; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+  .qr-box { background: white; padding: 16px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
+  .qr-box img { display: block; width: 180px; height: 180px; background: #f0f0f0; border-radius: 10px; }
+  .line-close { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: 0.2s; }
   .line-close:hover { background: rgba(0,0,0,0.4); }
+
+  /* --- CONFIRM CLEAR ALL MODAL --- */
+  .confirm-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    z-index: 500; display: none; justify-content: center; align-items: center;
+    opacity: 0; transition: opacity 0.3s; padding: 20px;
+  }
+  .confirm-modal-overlay.active { display: flex; opacity: 1; }
+
+  /* --- TOAST NOTIFICATION --- */
+  .toast {
+    position: fixed;
+    bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--white); color: #000;
+    padding: 12px 24px; border-radius: 100px;
+    font-weight: bold; font-family: var(--font-body); font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    z-index: var(--z-toast);
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
   /* --- LOADING --- */
   .loader {
-    width: 48px; height: 48px;
-    border: 5px solid #FFF;
-    border-bottom-color: var(--primary);
-    border-radius: 50%;
-    display: inline-block;
-    box-sizing: border-box;
-    animation: rotation 1s linear infinite;
+    width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: var(--primary);
+    border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite;
   }
   @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -767,12 +871,10 @@
     .nav-group-title { display: none; }
     
     .app-main { margin: 0; border-radius: 0; border-top-left-radius: 20px; border-top-right-radius: 20px; overflow: visible; }
-    
-    /* Responsive Top Bar */
     .top-bar { padding: 20px; flex-direction: column; align-items: flex-start; height: auto; gap: 16px; }
     .header-actions { width: 100%; flex-direction: column; align-items: stretch; gap: 12px;}
     .search-wrap { width: 100%; }
-    .btn-line { justify-content: center; } /* Center text in mobile button */
+    .btn-line { justify-content: center; } 
     
     .content-scroll { padding: 20px; overflow: visible; }
     
@@ -791,8 +893,11 @@
 <nav class="app-sidebar">
   <div class="sidebar-header">
     <div class="brand-logo">
-      <div class="brand-icon">E</div>
-      <div>E.D.N.</div>
+      <div class="brand-icon">NSH</div>
+      <div class="brand-text-wrapper">
+        <div class="brand-title">News Summary Helper</div>
+        <div class="brand-subtitle">  ──  你的新聞摘要助手 ──</div>
+      </div>
     </div>
   </div>
   
@@ -803,21 +908,20 @@
 
 <main class="app-main">
   <div class="top-bar">
-    <div class="page-title" id="pageTitle">DASHBOARD</div>
+    <div class="page-title" id="pageTitle">所有新聞</div>
     
-    <!-- [NEW] Header Actions Container -->
     <div class="header-actions">
       <!-- LINE Button -->
       <button class="btn-line" id="btnOpenLine">
-        <svg viewBox="0 0 24 24">
-          <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.122.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-3.843 2.572-5.992zm-18.988-2.595c.129 0 .234.105.234.234v4.153h2.296c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-3.219c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h.689zm5.32 5.076c0 .129-.105.234-.234.234h-.689c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h.689c.129 0 .234.105.234.234v5.076zm5.176-5.076c.129 0 .234.105.234.234v5.076c0 .129-.105.234-.234.234h-.689c-.042 0-.082-.012-.116-.033l-2.607-3.483v3.282c0 .129-.105.234-.234.234h-.689c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h.689c.041 0 .08.011.115.032l2.608 3.484v-3.282c0-.129.105-.234.234-.234h.689zm4.231 1.157c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-2.296v.919h2.296c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-3.219c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h3.219c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-2.296v.919h2.296z"/>
-        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="200" height="200" viewBox="6 6 36 36">
+        <path fill="#00c300" d="M12.5,42h23c3.59,0,6.5-2.91,6.5-6.5v-23C42,8.91,39.09,6,35.5,6h-23C8.91,6,6,8.91,6,12.5v23C6,39.09,8.91,42,12.5,42z"></path><path fill="#fff" d="M37.113,22.417c0-5.865-5.88-10.637-13.107-10.637s-13.108,4.772-13.108,10.637c0,5.258,4.663,9.662,10.962,10.495c0.427,0.092,1.008,0.282,1.155,0.646c0.132,0.331,0.086,0.85,0.042,1.185c0,0-0.153,0.925-0.187,1.122c-0.057,0.331-0.263,1.296,1.135,0.707c1.399-0.589,7.548-4.445,10.298-7.611h-0.001C36.203,26.879,37.113,24.764,37.113,22.417z M18.875,25.907h-2.604c-0.379,0-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687c0.379,0,0.687,0.308,0.687,0.687v4.521h1.917c0.379,0,0.687,0.308,0.687,0.687C19.562,25.598,19.254,25.907,18.875,25.907z M21.568,25.219c0,0.379-0.308,0.688-0.687,0.688s-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687s0.687,0.308,0.687,0.687V25.219z M27.838,25.219c0,0.297-0.188,0.559-0.47,0.652c-0.071,0.024-0.145,0.036-0.218,0.036c-0.215,0-0.42-0.103-0.549-0.275l-2.669-3.635v3.222c0,0.379-0.308,0.688-0.688,0.688c-0.379,0-0.688-0.308-0.688-0.688V20.01c0-0.296,0.189-0.558,0.47-0.652c0.071-0.024,0.144-0.035,0.218-0.035c0.214,0,0.42,0.103,0.549,0.275l2.67,3.635V20.01c0-0.379,0.309-0.687,0.688-0.687c0.379,0,0.687,0.308,0.687,0.687V25.219z M32.052,21.927c0.379,0,0.688,0.308,0.688,0.688c0,0.379-0.308,0.687-0.688,0.687h-1.917v1.23h1.917c0.379,0,0.688,0.308,0.688,0.687c0,0.379-0.309,0.688-0.688,0.688h-2.604c-0.378,0-0.687-0.308-0.687-0.688v-2.603c0-0.001,0-0.001,0-0.001c0,0,0-0.001,0-0.001v-2.601c0-0.001,0-0.001,0-0.002c0-0.379,0.308-0.687,0.687-0.687h2.604c0.379,0,0.688,0.308,0.688,0.687s-0.308,0.687-0.688,0.687h-1.917v1.23H32.052z"></path>
+        </svg>         
         LINE 官方帳號
       </button>
-
-      <!-- Search Box -->
       <div class="search-wrap">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon">
+          <svg width="16" height="16" viewBox="-2 -2 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
         <input type="text" id="searchInput" placeholder="Search news...">
       </div>
     </div>
@@ -852,12 +956,25 @@
 <div class="modal-overlay" id="modalOverlay">
   <!-- Article Card -->
   <div class="modal-card" id="modalCard">
+    <!-- Reading Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="readProgress"></div>
+    </div>
+
     <div class="modal-header">
       <div style="flex:1;">
         <span class="modal-cat-badge" id="modalCat">CATEGORY</span>
         <div class="modal-title" id="modalTitle">Title</div>
       </div>
-      <button class="drawer-close" id="modalClose">✕</button>
+      <div style="display:flex; gap:10px;">
+        <button class="icon-btn" id="modalBookmark" title="收藏文章">
+          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        </button>
+        <button class="icon-btn" id="btnSpeakArticle" title="語音朗讀全文">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+        <button class="icon-btn" id="modalClose">✕</button>
+      </div>
     </div>
     <div class="modal-body" id="modalBody">
       <!-- Content -->
@@ -870,8 +987,17 @@
   <!-- Independent Summary Popup -->
   <div class="summary-popup" id="summaryPopup">
     <div class="popup-header">
-      <span style="font-size:20px;">⚡</span>
-      <span class="popup-title">AI INTELLIGENCE</span>
+      <div class="popup-title">
+        <span style="font-size:20px;">⚡</span> AI INTELLIGENCE
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button class="icon-btn" id="btnShareSummary" title="分享摘要">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        </button>
+        <button class="icon-btn" id="btnSpeakSummary" title="語音朗讀摘要">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+      </div>
     </div>
     <div class="popup-body" id="summaryPopupBody">
       <!-- Generated Summary Goes Here -->
@@ -879,31 +1005,79 @@
   </div>
 </div>
 
-<!-- [NEW] LINE Modal Popup -->
+<!-- Custom iOS-style Share Sheet -->
+<div class="share-sheet-overlay" id="shareSheetOverlay">
+  <div class="share-sheet" id="shareSheet" onclick="event.stopPropagation();">
+    <div class="share-sheet-title">分享摘要至</div>
+    <div class="share-apps">
+      <button class="share-app-btn" onclick="shareTo('line')">
+        <div class="share-app-icon bg-line-share">
+              <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+              <path fill="#00c300" d="M12.5,42h23c3.59,0,6.5-2.91,6.5-6.5v-23C42,8.91,39.09,6,35.5,6h-23C8.91,6,6,8.91,6,12.5v23C6,39.09,8.91,42,12.5,42z"></path><path fill="#fff" d="M37.113,22.417c0-5.865-5.88-10.637-13.107-10.637s-13.108,4.772-13.108,10.637c0,5.258,4.663,9.662,10.962,10.495c0.427,0.092,1.008,0.282,1.155,0.646c0.132,0.331,0.086,0.85,0.042,1.185c0,0-0.153,0.925-0.187,1.122c-0.057,0.331-0.263,1.296,1.135,0.707c1.399-0.589,7.548-4.445,10.298-7.611h-0.001C36.203,26.879,37.113,24.764,37.113,22.417z M18.875,25.907h-2.604c-0.379,0-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687c0.379,0,0.687,0.308,0.687,0.687v4.521h1.917c0.379,0,0.687,0.308,0.687,0.687C19.562,25.598,19.254,25.907,18.875,25.907z M21.568,25.219c0,0.379-0.308,0.688-0.687,0.688s-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687s0.687,0.308,0.687,0.687V25.219z M27.838,25.219c0,0.297-0.188,0.559-0.47,0.652c-0.071,0.024-0.145,0.036-0.218,0.036c-0.215,0-0.42-0.103-0.549-0.275l-2.669-3.635v3.222c0,0.379-0.308,0.688-0.688,0.688c-0.379,0-0.688-0.308-0.688-0.688V20.01c0-0.296,0.189-0.558,0.47-0.652c0.071-0.024,0.144-0.035,0.218-0.035c0.214,0,0.42,0.103,0.549,0.275l2.67,3.635V20.01c0-0.379,0.309-0.687,0.688-0.687c0.379,0,0.687,0.308,0.687,0.687V25.219z M32.052,21.927c0.379,0,0.688,0.308,0.688,0.688c0,0.379-0.308,0.687-0.688,0.687h-1.917v1.23h1.917c0.379,0,0.688,0.308,0.688,0.687c0,0.379-0.309,0.688-0.688,0.688h-2.604c-0.378,0-0.687-0.308-0.687-0.688v-2.603c0-0.001,0-0.001,0-0.001c0,0,0-0.001,0-0.001v-2.601c0-0.001,0-0.001,0-0.002c0-0.379,0.308-0.687,0.687-0.687h2.604c0.379,0,0.688,0.308,0.688,0.687s-0.308,0.687-0.688,0.687h-1.917v1.23H32.052z"></path>
+              </svg>            
+            </div>
+            <span>LINE</span>
+          </button>
+          <button class="share-app-btn" onclick="shareTo('fb')">
+            <div class="share-app-icon bg-fb">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </div>
+            <span>Facebook</span>
+          </button>
+          <button class="share-app-btn" onclick="shareTo('x')">
+            <div class="share-app-icon bg-x">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.008 4.07H5.078z"></path></svg>
+            </div>
+            <span>X</span>
+          </button>
+          <button class="share-app-btn" onclick="shareTo('copy')">
+            <div class="share-app-icon bg-copy">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </div>
+            <span>複製文字</span>
+          </button>
+        </div>
+        <button class="share-cancel" id="shareSheetCancel">取消</button>
+      </div>
+    </div>
+
+<!-- LINE Modal Popup -->
 <div class="line-modal-overlay" id="lineModalOverlay">
   <div class="line-card">
     <button class="line-close" id="lineModalClose">✕</button>
     <div class="line-header">
-      <svg viewBox="0 0 24 24">
-        <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.122.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.572-3.843 2.572-5.992zm-18.988-2.595c.129 0 .234.105.234.234v4.153h2.296c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-3.219c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h.689zm5.32 5.076c0 .129-.105.234-.234.234h-.689c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h.689c.129 0 .234.105.234.234v5.076zm5.176-5.076c.129 0 .234.105.234.234v5.076c0 .129-.105.234-.234.234h-.689c-.042 0-.082-.012-.116-.033l-2.607-3.483v3.282c0 .129-.105.234-.234.234h-.689c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h.689c.041 0 .08.011.115.032l2.608 3.484v-3.282c0-.129.105-.234.234-.234h.689zm4.231 1.157c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-2.296v.919h2.296c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-3.219c-.129 0-.234-.105-.234-.234v-5.076c0-.129.105-.234.234-.234h3.219c.129 0 .234.105.234.234v.689c0 .129-.105.234-.234.234h-2.296v.919h2.296z"/>
-      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="600" height="600" viewBox="6 6 36 36">
+      <path fill="#00c300" d="M12.5,42h23c3.59,0,6.5-2.91,6.5-6.5v-23C42,8.91,39.09,6,35.5,6h-23C8.91,6,6,8.91,6,12.5v23C6,39.09,8.91,42,12.5,42z"></path><path fill="#fff" d="M37.113,22.417c0-5.865-5.88-10.637-13.107-10.637s-13.108,4.772-13.108,10.637c0,5.258,4.663,9.662,10.962,10.495c0.427,0.092,1.008,0.282,1.155,0.646c0.132,0.331,0.086,0.85,0.042,1.185c0,0-0.153,0.925-0.187,1.122c-0.057,0.331-0.263,1.296,1.135,0.707c1.399-0.589,7.548-4.445,10.298-7.611h-0.001C36.203,26.879,37.113,24.764,37.113,22.417z M18.875,25.907h-2.604c-0.379,0-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687c0.379,0,0.687,0.308,0.687,0.687v4.521h1.917c0.379,0,0.687,0.308,0.687,0.687C19.562,25.598,19.254,25.907,18.875,25.907z M21.568,25.219c0,0.379-0.308,0.688-0.687,0.688s-0.687-0.308-0.687-0.688V20.01c0-0.379,0.308-0.687,0.687-0.687s0.687,0.308,0.687,0.687V25.219z M27.838,25.219c0,0.297-0.188,0.559-0.47,0.652c-0.071,0.024-0.145,0.036-0.218,0.036c-0.215,0-0.42-0.103-0.549-0.275l-2.669-3.635v3.222c0,0.379-0.308,0.688-0.688,0.688c-0.379,0-0.688-0.308-0.688-0.688V20.01c0-0.296,0.189-0.558,0.47-0.652c0.071-0.024,0.144-0.035,0.218-0.035c0.214,0,0.42,0.103,0.549,0.275l2.67,3.635V20.01c0-0.379,0.309-0.687,0.688-0.687c0.379,0,0.687,0.308,0.687,0.687V25.219z M32.052,21.927c0.379,0,0.688,0.308,0.688,0.688c0,0.379-0.308,0.687-0.688,0.687h-1.917v1.23h1.917c0.379,0,0.688,0.308,0.688,0.687c0,0.379-0.309,0.688-0.688,0.688h-2.604c-0.378,0-0.687-0.308-0.687-0.688v-2.603c0-0.001,0-0.001,0-0.001c0,0,0-0.001,0-0.001v-2.601c0-0.001,0-0.001,0-0.002c0-0.379,0.308-0.687,0.687-0.687h2.604c0.379,0,0.688,0.308,0.688,0.687s-0.308,0.687-0.688,0.687h-1.917v1.23H32.052z"></path>
+      </svg>      
       <h2>LINE 官方服務</h2>
     </div>
     <div class="line-body">
-      <p>我們也在 LINE 上為您提供服務！<br>立刻加入好友，隨時隨地接收最新財經新聞摘要。</p>
-      
+      <p>我們也在 LINE 上為您提供服務！<br>立刻加入好友，隨時隨地接收最新財經摘要與重點推播。</p>
       <div class="qr-box">
-        <!-- 在這裡放上您的實際 QR Code 圖片網址 -->
-        <img src="https://qr-official.line.me/gs/M_351pxsjv_GW.png?oat_content=qr" alt="LINE QR Code" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'180\' height=\'180\'><rect width=\'180\' height=\'180\' fill=\'%23eee\'/><text x=\'50%\' y=\'50%\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\' text-anchor=\'middle\' alignment-baseline=\'middle\'>請替換為您的 QR Code</text></svg>'">
+        <img src="https://qr-official.line.me/gs/M_000abcde_GW.png?oat_content=qr" alt="LINE QR Code" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'180\' height=\'180\'><rect width=\'180\' height=\'180\' fill=\'%23eee\'/><text x=\'50%\' y=\'50%\' fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\' text-anchor=\'middle\' alignment-baseline=\'middle\'>請替換為您的 QR Code</text></svg>'">
       </div>
-      
       <p style="font-size: 12px; color: #888; margin-top: 10px; margin-bottom: 0;">打開 LINE 掃描 QR Code 立即綁定</p>
     </div>
   </div>
 </div>
 
+<!-- Confirm Clear All Modal -->
+<div class="confirm-modal-overlay" id="confirmModalOverlay">
+  <div class="line-card" style="max-width: 360px; padding: 30px; text-align: center;">
+    <h3 style="font-family: var(--font-head); font-size: 22px; color: #fff; margin-bottom: 15px;">確認清空收藏</h3>
+    <p style="color: #CCC; margin-bottom: 25px; line-height: 1.6; font-size: 15px;">確定要移除所有已收藏的新聞嗎？<br>此動作執行後將無法復原。</p>
+    <div style="display: flex; gap: 15px; justify-content: center;">
+      <button onclick="closeConfirmModal()" style="flex: 1; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.1); color: #fff; border: none; cursor: pointer; font-family: var(--font-ui); font-weight: bold; transition: 0.2s;">取消</button>
+      <button onclick="executeClearAllSaved()" style="flex: 1; padding: 12px; border-radius: 12px; background: #ff3c3c; color: #fff; border: none; cursor: pointer; font-family: var(--font-ui); font-weight: bold; transition: 0.2s; box-shadow: 0 4px 15px rgba(255, 60, 60, 0.3);">確定刪除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Global Toast Notification -->
+<div id="toast" class="toast">✅ 已處理</div>
+
 <script>
-  const API_BASE = 'https://newsbot.aryhsg.com';
+  const API_BASE = 'https://newsapi.aryhsg.com';
   
   const CATEGORIES = [
     '要聞','國際','證券','期貨','理財','房市',
@@ -911,37 +1085,64 @@
   ];
 
   let allNews = [];
+  let currentGridData = [];
   let currentCategory = '';
   let searchQuery = '';
   let currentNews = null;
+  
+  let savedIds = JSON.parse(localStorage.getItem('edn_saved_articles') || '[]');
+
+  let currentArticleTextForTTS = "";
+  let currentSummaryTextForTTS = "";
+  
+  // Reusable SVG for stars to ensure perfect centering
+  const starSVG = `<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>`;
 
   // Init
   function init() {
     renderSidebar();
     fetchNewsList();
     setupEvents();
+    setupScrollProgress();
+  }
+
+  // Toast Function
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.innerHTML = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
   }
 
   function renderSidebar() {
     const container = document.getElementById('navContainer');
     let html = `
       <div class="nav-group-title">Menu</div>
-      <button class="nav-item active" onclick="setCategory('')" id="nav-all">
-        <span>All News</span>
+      <button class="nav-item highlight ${currentCategory === 'saved' ? 'active' : ''}" onclick="setCategory('saved')" id="nav-saved">
+        <span>⭐ 我的收藏</span>
+        <span class="nav-item-count" id="cnt-saved">${savedIds.length}</span>
+      </button>
+      <button class="nav-item ${currentCategory === '' ? 'active' : ''}" onclick="setCategory('')" id="nav-all">
+        <span>所有新聞</span>
         <span class="nav-item-count" id="cnt-all">0</span>
       </button>
       <div class="nav-group-title">Categories</div>
     `;
     
     CATEGORIES.forEach(cat => {
+      // 這裡補上判斷 active 的邏輯，修復你最初提到的點擊沒有變色的問題
+      const isActive = currentCategory === cat ? 'active' : '';
       html += `
-        <button class="nav-item" onclick="setCategory('${cat}')" id="nav-${cat}">
+        <button class="nav-item ${isActive}" onclick="setCategory('${cat}')" id="nav-${cat}">
           <span>${cat}</span>
           <span class="nav-item-count" id="cnt-${cat}">0</span>
         </button>
       `;
     });
     container.innerHTML = html;
+    
+    // 關鍵修復：每次重新渲染側邊欄選單後，因為原本是填入 0，必須呼叫更新數量的函式把真正的資料塞進去
+    updateCounts();
   }
 
   async function fetchNewsList() {
@@ -952,43 +1153,108 @@
       const res = await fetch(`${API_BASE}/api/news`);
       if(!res.ok) throw new Error();
       allNews = await res.json();
+      currentGridData = allNews;
       updateCounts();
-      renderGrid(allNews); 
+      renderGrid(); 
     } catch(e) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#666;">Failed to load data.</div>';
     }
   }
 
   function updateCounts() {
-    document.getElementById('cnt-all').innerText = allNews.length;
+    if(document.getElementById('cnt-all')) document.getElementById('cnt-all').innerText = allNews.length;
+    if(document.getElementById('cnt-saved')) document.getElementById('cnt-saved').innerText = savedIds.length;
+    
     CATEGORIES.forEach(cat => {
       const cnt = allNews.filter(n => n.category === cat).length;
-      document.getElementById(`cnt-${cat}`).innerText = cnt;
+      if(document.getElementById(`cnt-${cat}`)) document.getElementById(`cnt-${cat}`).innerText = cnt;
     });
   }
 
-  function renderGrid(dataSource) {
-    const grid = document.getElementById('newsGrid');
-    const filtered = (dataSource || allNews).filter(n => {
-      const matchCat = !currentCategory || n.category === currentCategory;
-      const matchSearch = (dataSource === allNews && searchQuery) 
-        ? n.title.includes(searchQuery) 
-        : true;
-        
-      return matchCat && matchSearch;
-    });
+  // Bookmark Toggle Function - Using SVG class toggling
+  window.toggleSave = function(id, event) {
+    if (event) event.stopPropagation(); 
+    id = Number(id) || String(id);
+    
+    const isSavedNow = savedIds.includes(id) || savedIds.includes(String(id));
+    
+    if(isSavedNow) {
+        savedIds = savedIds.filter(x => String(x) !== String(id));
+        showToast('❌ 已從收藏移除');
+    } else {
+        savedIds.push(id);
+        showToast('⭐ 已加入我的收藏');
+    }
+    
+    localStorage.setItem('edn_saved_articles', JSON.stringify(savedIds));
+    updateCounts();
+    
+    const isSavedNew = !isSavedNow;
 
-    document.getElementById('pageTitle').innerText = currentCategory ? currentCategory : 'DASHBOARD';
+    // Sync Modal button if open
+    if (currentNews && String(currentNews.id) === String(id)) {
+        const mBtn = document.getElementById('modalBookmark');
+        if (mBtn) {
+            if(isSavedNew) { mBtn.classList.add('saved'); }
+            else { mBtn.classList.remove('saved'); }
+        }
+    }
+
+    // If currently viewing "Saved" category, re-render to remove card instantly
+    if (currentCategory === 'saved') {
+        renderGrid();
+    } else {
+        // Find the specific card button and update its class without re-rendering grid
+        const cardBtn = document.querySelector(`.card-bookmark[data-id="${id}"]`);
+        if (cardBtn) {
+            if(isSavedNew) { cardBtn.classList.add('saved'); }
+            else { cardBtn.classList.remove('saved'); }
+        }
+    }
+  };
+
+  // Grid rendering handling 'saved' logic & Sorting (Newest to Oldest)
+  function renderGrid() {
+    const grid = document.getElementById('newsGrid');
+    let filtered = currentGridData || allNews;
+    let gridHtml = '';
+
+    if (currentCategory === 'saved') {
+        filtered = filtered.filter(n => savedIds.includes(n.id) || savedIds.includes(String(n.id)));
+        document.getElementById('pageTitle').innerText = '我的收藏';
+
+        // 如果在「我的收藏」且裡面有內容，顯示「清空所有收藏」按鈕
+        if (filtered.length > 0) {
+            gridHtml += `
+            <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; margin-bottom: -10px;">
+                <button onclick="confirmClearAllSaved()" style="background: rgba(255, 60, 60, 0.1); border: 1px solid rgba(255, 60, 60, 0.3); color: #ff5555; padding: 8px 20px; border-radius: 12px; cursor: pointer; font-family: var(--font-ui); font-weight: 700; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                    清空所有收藏
+                </button>
+            </div>`;
+        }
+    } else {
+        filtered = filtered.filter(n => {
+          const matchCat = !currentCategory || n.category === currentCategory;
+          const matchSearch = (currentGridData === allNews && searchQuery) ? n.title.includes(searchQuery) : true;
+          return matchCat && matchSearch;
+        });
+        document.getElementById('pageTitle').innerText = currentCategory ? currentCategory : '所有新聞';
+    }
 
     if(filtered.length === 0) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:50px;color:#666;">目前尚無新聞</div>';
       return;
     }
 
-    grid.innerHTML = filtered.map(news => {
+    // [UPDATED] Reverse the array to show newest items first
+    const reversedFiltered = [...filtered].reverse();
+
+    gridHtml += reversedFiltered.map(news => {
       const img = news.img || '';
       const fallback = `<div style="width:100%;height:100%;background:#222;display:flex;align-items:center;justify-content:center;color:#444;font-weight:900;font-size:30px;">${news.category[0]}</div>`;
       const imgHtml = img ? `<img src="${esc(img)}" onerror="this.parentElement.innerHTML='${esc(fallback)}'">` : fallback;
+      const isSaved = savedIds.includes(news.id) || savedIds.includes(String(news.id));
 
       return `
         <div class="trend-card" onclick="openModal(${news.id})">
@@ -1001,38 +1267,58 @@
           </div>
           <div class="card-meta">
             <span class="cat-pill">${news.category}</span>
-            <span>ID: ${news.id}</span>
+            <button class="card-bookmark ${isSaved ? 'saved' : ''}" data-id="${news.id}" onclick="toggleSave('${news.id}', event)" title="收藏文章">
+                ${starSVG}
+            </button>
           </div>
         </div>
       `;
     }).join('');
+    
+    grid.innerHTML = gridHtml;
   }
 
+  // Clear All Saved Logic
+  window.confirmClearAllSaved = function() {
+    document.getElementById('confirmModalOverlay').classList.add('active');
+  };
+
+  window.closeConfirmModal = function() {
+    document.getElementById('confirmModalOverlay').classList.remove('active');
+  };
+
+  window.executeClearAllSaved = function() {
+    savedIds = [];
+    localStorage.setItem('edn_saved_articles', JSON.stringify(savedIds));
+    updateCounts();
+    renderSidebar();
+    renderGrid();
+    closeConfirmModal();
+    showToast('🗑️ 已清空所有收藏');
+  };
+
+  // --- ACTIONS ---
   window.setCategory = function(cat) {
     currentCategory = cat;
-    
     searchQuery = '';
     document.getElementById('searchInput').value = '';
-
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    if(cat === '') document.getElementById('nav-all').classList.add('active');
-    else document.getElementById(`nav-${cat}`).classList.add('active');
+    renderSidebar(); // Re-render to update active classes securely
 
     const toggle = document.getElementById('summaryToggle');
-    if(cat === '') {
+    if(cat === '' || cat === 'saved') {
       toggle.classList.remove('visible');
       closeDrawer();
     } else {
       toggle.classList.add('visible');
       updateDrawerContent(cat);
     }
-
-    renderGrid(allNews);
+    
+    currentGridData = allNews;
+    renderGrid();
   };
 
   async function updateDrawerContent(cat) {
     const content = document.getElementById('drawerContent');
-    
     content.innerHTML = `
       <div style="text-align:center; padding:40px;">
         <span class="loader"></span>
@@ -1045,7 +1331,6 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
-
       if (!res.ok) throw new Error('API Error');
       const data = await res.json();
       const summaryText = data.summary || "暫無摘要資料";
@@ -1055,24 +1340,9 @@
           <span class="summary-label">AI Analysis Report</span>
           <div class="summary-text">${summaryText}</div>
         </div>
-        
-        <div class="summary-box">
-          <span class="summary-label">Category Stats</span>
-          <div class="summary-text">
-            Total Articles: <strong>${allNews.filter(n=>n.category===cat).length}</strong><br>
-            Status: <strong>Live</strong>
-          </div>
-        </div>
       `;
     } catch (e) {
-      content.innerHTML = `
-        <div class="summary-box" style="border-color:#555;">
-          <span class="summary-label">System Message</span>
-          <div class="summary-text" style="color:#aaa;">
-            目前無法取得摘要。<br>可能是 API 尚未連線或該類別資料不足。
-          </div>
-        </div>
-      `;
+      content.innerHTML = `<div class="summary-box" style="border-color:#555;"><span class="summary-label">System Message</span><div class="summary-text" style="color:#aaa;">目前無法取得摘要。</div></div>`;
     }
   }
 
@@ -1081,14 +1351,22 @@
   
   toggleBtn.onclick = () => drawer.classList.add('open');
   document.getElementById('drawerClose').onclick = closeDrawer;
+  function closeDrawer() { drawer.classList.remove('open'); }
 
-  function closeDrawer() {
-    drawer.classList.remove('open');
+  // Reading Progress Calculation
+  function setupScrollProgress() {
+    const modalBody = document.getElementById('modalBody');
+    const progressBar = document.getElementById('readProgress');
+    modalBody.addEventListener('scroll', () => {
+      const maxScroll = modalBody.scrollHeight - modalBody.clientHeight;
+      const percentage = maxScroll > 0 ? (modalBody.scrollTop / maxScroll) * 100 : 0;
+      progressBar.style.width = percentage + '%';
+    });
   }
 
   // --- MODAL ---
   window.openModal = async function(id) {
-    const news = allNews.find(n => n.id === id);
+    const news = allNews.find(n => n.id == id);
     if(!news) return;
     currentNews = news;
 
@@ -1097,12 +1375,24 @@
     const btn = document.getElementById('btnSummarize');
     const summaryPopup = document.getElementById('summaryPopup');
     
+    // Stop any ongoing speech
+    stopTTS();
+
+    // Reset UI
     btn.innerText = 'GENERATE AI REPORT';
     btn.disabled = false;
     summaryPopup.style.display = 'none';
-    
+    document.getElementById('readProgress').style.width = '0%';
     document.getElementById('modalTitle').innerText = news.title;
     document.getElementById('modalCat').innerText = news.category;
+    
+    // Sync Modal Bookmark state
+    const mBtn = document.getElementById('modalBookmark');
+    const isSaved = savedIds.includes(news.id) || savedIds.includes(String(news.id));
+    if(isSaved) { mBtn.classList.add('saved'); }
+    else { mBtn.classList.remove('saved'); }
+    // Attach event locally to avoid stale context
+    mBtn.onclick = (e) => toggleSave(news.id, e);
     
     body.innerHTML = '<div style="text-align:center;padding:50px;"><span class="loader"></span></div>';
     overlay.classList.add('active');
@@ -1112,6 +1402,9 @@
       const data = await res.json();
       
       const imgHtml = data.img ? `<img class="modal-img" src="${esc(data.img)}">` : '';
+      
+      // Store content for TTS
+      currentArticleTextForTTS = data.content || '';
       
       body.innerHTML = `
         ${imgHtml}
@@ -1125,13 +1418,22 @@
   }
 
   document.getElementById('modalClose').onclick = () => {
+    stopTTS(); // Stop speech when closing
     document.getElementById('modalOverlay').classList.remove('active');
   };
   
   document.addEventListener('keydown', (e) => {
     if(e.key === 'Escape') {
+      stopTTS();
       document.getElementById('modalOverlay').classList.remove('active');
       document.getElementById('lineModalOverlay').classList.remove('active');
+      
+      const shareOverlay = document.getElementById('shareSheetOverlay');
+      if(shareOverlay) shareOverlay.classList.remove('active');
+      
+      const confirmOverlay = document.getElementById('confirmModalOverlay');
+      if(confirmOverlay) confirmOverlay.classList.remove('active');
+
       closeDrawer();
     }
   });
@@ -1152,13 +1454,16 @@
           const res = await fetch(`${API_BASE}/api/news/search?q=${encodeURIComponent(query)}`);
           if (!res.ok) throw new Error('Search API Error');
           const searchResults = await res.json();
-          renderGrid(searchResults);
+          currentGridData = searchResults;
+          renderGrid();
         } catch (error) {
           console.warn('Search API failed, falling back to client filter', error);
-          renderGrid(allNews); 
+          currentGridData = allNews;
+          renderGrid(); 
         }
       } else {
-        renderGrid(allNews);
+        currentGridData = allNews;
+        renderGrid();
       }
     }, 500);
   });
@@ -1166,10 +1471,8 @@
   // --- AI SUMMARY ---
   document.getElementById('btnSummarize').onclick = async function() {
     if(!currentNews) return;
-    
     const btn = this;
     const originalText = btn.innerText;
-    
     btn.innerText = 'GENERATING SUMMARY...';
     btn.disabled = true;
 
@@ -1178,50 +1481,164 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
-
       if (!response.ok) throw new Error('API Error');
 
       const data = await response.json();
       const summaryText = data.summary || data.text || "Summary generated successfully.";
 
+      // Store for TTS & Share
+      currentSummaryTextForTTS = summaryText;
+
       const summaryPopup = document.getElementById('summaryPopup');
       const summaryBody = document.getElementById('summaryPopupBody');
-      
       summaryBody.innerHTML = summaryText; 
       summaryPopup.style.display = 'flex';
-      
       btn.innerText = 'REPORT GENERATED';
 
     } catch (error) {
-      console.error('Summary Generation Failed:', error);
       btn.innerText = 'GENERATION FAILED';
       btn.disabled = false;
       setTimeout(() => btn.innerText = originalText, 2000);
     }
   };
   
-  // --- [NEW] LINE Modal Events ---
+  // -----------------------------------------------------
+  // TEXT-TO-SPEECH (TTS) LOGIC
+  // -----------------------------------------------------
+  let speechUtterance = null;
+  let isSpeaking = false;
+  let currentSpeakBtnId = null;
+
+  function stopTTS() {
+      if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+      }
+      isSpeaking = false;
+      document.getElementById('btnSpeakArticle').classList.remove('playing');
+      document.getElementById('btnSpeakSummary').classList.remove('playing');
+  }
+
+  function handleSpeak(htmlContent, btnId) {
+      if (!('speechSynthesis' in window)) {
+          showToast('❌ 您的瀏覽器不支援語音朗讀功能');
+          return;
+      }
+      
+      const btn = document.getElementById(btnId);
+
+      // If already playing the same thing, stop it
+      if (isSpeaking && currentSpeakBtnId === btnId) {
+          stopTTS();
+          return;
+      }
+      
+      // Stop anything else playing
+      stopTTS();
+      currentSpeakBtnId = btnId;
+
+      // Text Pre-processing: Handle lists gracefully for audio
+      let textToRead = htmlContent
+          .replace(/<li[^>]*>/gi, "，重點：") 
+          .replace(/<\/li>/gi, "。")           
+          .replace(/<br\s*[\/]?>/gi, "。")     
+          .replace(/<[^>]*>?/gm, '')           
+          .trim();
+
+      if (!textToRead) {
+          showToast('沒有可供朗讀的內容');
+          return;
+      }
+
+      speechUtterance = new SpeechSynthesisUtterance(textToRead);
+      speechUtterance.lang = 'zh-TW';
+      speechUtterance.rate = 1.0; 
+
+      speechUtterance.onstart = () => {
+          isSpeaking = true;
+          btn.classList.add('playing');
+          showToast('🔊 開始朗讀');
+      };
+
+      speechUtterance.onend = () => {
+          isSpeaking = false;
+          btn.classList.remove('playing');
+      };
+
+      speechUtterance.onerror = (e) => {
+          if (e.error !== 'canceled') {
+              console.error("Speech Synthesis Error:", e);
+              isSpeaking = false;
+              btn.classList.remove('playing');
+          }
+      };
+
+      window.speechSynthesis.speak(speechUtterance);
+  }
+
+  document.getElementById('btnSpeakArticle').onclick = () => {
+      handleSpeak(currentArticleTextForTTS || document.getElementById('modalBody').innerHTML, 'btnSpeakArticle');
+  };
+
+  document.getElementById('btnSpeakSummary').onclick = () => {
+      handleSpeak(currentSummaryTextForTTS, 'btnSpeakSummary');
+  };
+
+  // -----------------------------------------------------
+  // SHARE SUMMARY LOGIC
+  // -----------------------------------------------------
+  document.getElementById('btnShareSummary').onclick = () => {
+      if (!currentSummaryTextForTTS) return;
+      document.getElementById('shareSheetOverlay').classList.add('active');
+  };
+
+  window.shareTo = function(platform) {
+      if (!currentSummaryTextForTTS) return;
+
+      const cleanText = currentSummaryTextForTTS
+          .replace(/<li[^>]*>/gi, "\n• ")
+          .replace(/<br\s*[\/]?>/gi, "\n")
+          .replace(/<[^>]*>?/gm, '')
+          .trim();
+
+      const url = window.location.href;
+      const shareContent = `【新聞摘要重點】\n${cleanText}\n\n閱讀全文：${url}`;
+
+      if (platform === 'line') {
+          window.open(`https://social-plugins.line.me/lineit/share?url={url}&text={shareContent}`, '_blank');
+      } else if (platform === 'fb') {
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareContent)}`, '_blank');
+      } else if (platform === 'x') {
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareContent)}`, '_blank');
+      } else if (platform === 'copy') {
+          const textArea = document.createElement("textarea");
+          textArea.value = shareContent;
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+              document.execCommand('copy');
+              showToast('🔗 摘要已複製到剪貼簿');
+          } catch (err) {
+              showToast('❌ 複製失敗');
+          }
+          document.body.removeChild(textArea);
+      }
+      
+      document.getElementById('shareSheetOverlay').classList.remove('active');
+  };
+
   function setupEvents() {
     const lineBtn = document.getElementById('btnOpenLine');
     const lineModal = document.getElementById('lineModalOverlay');
     const lineClose = document.getElementById('lineModalClose');
 
-    // Open LINE Modal
-    lineBtn.onclick = () => {
-      lineModal.classList.add('active');
-    };
+    lineBtn.onclick = () => { lineModal.classList.add('active'); };
+    lineClose.onclick = () => { lineModal.classList.remove('active'); };
+    lineModal.onclick = (e) => { if(e.target === lineModal) lineModal.classList.remove('active'); };
 
-    // Close LINE Modal on X click
-    lineClose.onclick = () => {
-      lineModal.classList.remove('active');
-    };
-
-    // Close LINE Modal on outside click
-    lineModal.onclick = (e) => {
-      if(e.target === lineModal) {
-        lineModal.classList.remove('active');
-      }
-    };
+    // Share Sheet Events
+    const shareOverlay = document.getElementById('shareSheetOverlay');
+    document.getElementById('shareSheetCancel').onclick = () => shareOverlay.classList.remove('active');
+    shareOverlay.onclick = (e) => { if(e.target === shareOverlay) shareOverlay.classList.remove('active'); };
   }
 
   function esc(s) {
