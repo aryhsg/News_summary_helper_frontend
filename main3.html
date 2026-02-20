@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>N.S.H. 你的新聞摘要助手</title>
+<link rel="icon" href="nsh-logo.png" type="image/png">
 <!-- 引入更圓潤幾何的字體 Outfit 與 Manrope -->
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&family=Outfit:wght@400;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -79,15 +80,18 @@
   }
   
   .brand-icon {
-    width: 56px; height: 56px;
-    background: var(--grad-primary);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 900; color: #fff;
-    box-shadow: 0 4px 15px rgba(255, 94, 20, 0.3);
-    font-family: var(--font-head);
-    flex-shrink: 0;
-    letter-spacing: 0.5px;
+  width: 40px;      /* 根據你的設計調整寬度 */
+  height: 40px;     /* 根據你的設計調整高度 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* 確保圖片不超出範圍 */
+}
+
+  .brand-icon img {
+    width: 100%;      /* 讓圖片寬度撐滿容器 */
+    height: auto;     /* 高度自動，維持比例 */
+    object-fit: contain; /* 確保圖片完整顯示，不會被裁切 */
   }
 
   .brand-text-wrapper {
@@ -103,7 +107,7 @@
     font-family: var(--font-ui);
     font-weight: 800;
     font-size: 15.5px;
-    color: #c91306;
+    color: #FF5511;
     line-height: 1.1;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -893,7 +897,9 @@
 <nav class="app-sidebar">
   <div class="sidebar-header">
     <div class="brand-logo">
-      <div class="brand-icon">N.S.H.</div>
+      <div class="brand-icon">
+        <img src="nsh-logo.png" alt="NSH Logo">
+      </div>
       <div class="brand-text-wrapper">
         <div class="brand-title">News Summary Helper</div>
         <div class="brand-subtitle"> ──  你的新聞摘要助手 ──</div>
