@@ -770,6 +770,7 @@
   .popup-body ul, .popup-body ol { padding-left: 20px; margin-bottom: 16px; }
   .popup-body li { margin-bottom: 8px; }
 
+  .mobile-summary-close { display: none; }
   /* --- [NEW] CUSTOM iOS STYLE SHARE SHEET --- */
   .share-sheet-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
@@ -886,9 +887,14 @@
     .summary-drawer { width: 100%; top: 20px; bottom: 0; right: 0; border-radius: 20px 20px 0 0; transform: translateY(100%); }
     .summary-drawer.open { transform: translateY(0); }
 
-    .modal-overlay { flex-direction: column; justify-content: flex-start; padding: 10px; }
-    .modal-card { width: 100%; max-width: 100%; height: auto; max-height: 60vh; }
-    .summary-popup { width: 100%; height: auto; max-height: 40vh; }
+    .modal-overlay { flex-direction: column; justify-content: center; padding: 15px; }
+    .modal-card { width: 100%; max-width: 100%; height: 85vh; max-height: none; }
+    .modal-img {height: auto; aspect-ratio: 16 / 9; }
+    .summary-popup { 
+      position: absolute; top: 0; bottom: 0; left: 0; right: 0; margin: auto; width: calc(100% - 30px); 
+      height: 85vh; max-height: none; z-index: 250; 
+    }
+    .mobile-summary-close { display: inline-flex !important; }
   }
 </style>
 </head>
@@ -986,7 +992,7 @@
       <!-- Content -->
     </div>
     <div class="modal-footer">
-      <button class="btn-primary" id="btnSummarize">GENERATE AI REPORT</button>
+      <button class="btn-primary" id="btnSummarize">生成新聞摘要</button>
     </div>
   </div>
 
@@ -994,7 +1000,7 @@
   <div class="summary-popup" id="summaryPopup">
     <div class="popup-header">
       <div class="popup-title">
-        <span style="font-size:20px;">⚡</span> AI 摘要生成
+        <span style="font-size:20px;">⚡</span> AI 摘要重點生成
       </div>
       <div style="display:flex; gap:10px;">
         <button class="icon-btn" id="btnShareSummary" title="分享摘要">
@@ -1003,6 +1009,7 @@
         <button class="icon-btn" id="btnSpeakSummary" title="語音朗讀摘要">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
         </button>
+        <button class="icon-btn" id="btnSummaryClose" title="關閉摘要">✕</button>
       </div>
     </div>
     <div class="popup-body" id="summaryPopupBody">
@@ -1513,10 +1520,10 @@
       const summaryBody = document.getElementById('summaryPopupBody');
       summaryBody.innerHTML = summaryText; 
       summaryPopup.style.display = 'flex';
-      btn.innerText = 'REPORT GENERATED';
+      btn.innerText = '摘要生成完成';
 
     } catch (error) {
-      btn.innerText = 'GENERATION FAILED';
+      btn.innerText = '摘要生成失敗';
       btn.disabled = false;
       setTimeout(() => btn.innerText = originalText, 2000);
     }
@@ -1603,48 +1610,97 @@
       handleSpeak(currentSummaryTextForTTS, 'btnSpeakSummary');
   };
 
-  // -----------------------------------------------------
-  // SHARE SUMMARY LOGIC
-  // -----------------------------------------------------
-  document.getElementById('btnShareSummary').onclick = () => {
-      if (!currentSummaryTextForTTS) return;
-      document.getElementById('shareSheetOverlay').classList.add('active');
-  };
+// -----------------------------------------------------
+// SHARE SUMMARY LOGIC
+// -----------------------------------------------------
 
-  window.shareTo = function(platform) {
-      if (!currentSummaryTextForTTS) return;
+// 修改 1：點擊分享按鈕後的初始判斷
+document.getElementById('btnShareSummary').onclick = async () => {
+    if (!currentSummaryTextForTTS) return;
 
-      const cleanText = currentSummaryTextForTTS
-          .replace(/<li[^>]*>/gi, "\n• ")
-          .replace(/<br\s*[\/]?>/gi, "\n")
-          .replace(/<[^>]*>?/gm, '')
-          .trim();
+    const shareContent = generateShareContent(); // 封裝內容產生逻辑
+    const isMobileDevice = window.matchMedia("(max-width: 768px)").matches;
 
-      const url = window.location.href;
-      const shareContent = `【新聞摘要重點】\n${cleanText}\n\n閱讀全文：${url}`;
+    // 如果是手機且支援原生分享，直接喚起，不秀出自訂 Sheet
+    if (isMobileDevice && navigator.share) {
+        try {
+            await navigator.share({
+                title: '新聞摘要重點',
+                text: shareContent,
+                // url: window.location.href // 視需求決定是否分開帶 URL
+            });
+            console.log("系統分享成功");
+        } catch (err) {
+            console.error("系統分享取消或失敗:", err);
+            // 如果手機版原生分享失敗（例如被取消），可選擇是否要 fallback 到自訂介面
+            // document.getElementById('shareSheetOverlay').classList.add('active');
+        }
+    } 
+    // 如果是電腦版，才開啟你寫的 iOS-style Share Sheet
+    else {
+        document.getElementById('shareSheetOverlay').classList.add('active');
+    }
+};
 
-      if (platform === 'line') {
-          window.open(`https://social-plugins.line.me/lineit/share?url={url}&text={shareContent}`, '_blank');
-      } else if (platform === 'fb') {
-          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareContent)}`, '_blank');
-      } else if (platform === 'x') {
-          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareContent)}`, '_blank');
-      } else if (platform === 'copy') {
-          const textArea = document.createElement("textarea");
-          textArea.value = shareContent;
-          document.body.appendChild(textArea);
-          textArea.select();
-          try {
-              document.execCommand('copy');
-              showToast('🔗 摘要已複製到剪貼簿');
-          } catch (err) {
-              showToast('❌ 複製失敗');
-          }
-          document.body.removeChild(textArea);
-      }
-      
-      document.getElementById('shareSheetOverlay').classList.remove('active');
-  };
+// 封裝文字清理與內容格式
+function generateShareContent() {
+    const cleanText = currentSummaryTextForTTS
+        .replace(/<li[^>]*>/gi, "\n• ")
+        .replace(/<br\s*[\/]?>/gi, "\n")
+        .replace(/<[^>]*>?/gm, '')
+        .trim();
+    const url = window.location.href;
+    return `【新聞摘要重點】\n${cleanText}\n\n閱讀全文：${url}`;
+}
+
+// 修改 2：ShareTo 函式現在只專注於處理「自訂介面」中的按鈕行為
+window.shareTo = function(platform) {
+    if (!currentSummaryTextForTTS) return;
+
+    const shareContent = generateShareContent();
+    const url = window.location.href;
+
+    // 因為 shareTo 是從自訂介面點擊的，這裡通常已經是電腦版或不支援原生分享的環境
+    if (platform === 'line') {
+        // 使用 Social Plugin 格式避免電腦版跳轉官網
+        window.open(`https://social-plugins.line.me/lineit/share?text=${encodeURIComponent(shareContent)}`, '_blank');
+    } 
+    else if (platform === 'fb') {
+        // 注意：FB電腦版 quote 參數已失效，僅能帶入網址
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+    } 
+    else if (platform === 'x') {
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareContent)}`, '_blank');
+    } 
+    else if (platform === 'copy') {
+        copyToClipboard(shareContent);
+    }
+    
+    // 執行完畢關閉 Sheet
+    document.getElementById('shareSheetOverlay').classList.remove('active');
+};
+
+// 封裝複製功能
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => showToast('🔗 摘要已複製到剪貼簿'))
+            .catch(() => showToast('❌ 複製失敗'));
+    } else {
+        // Fallback 傳統做法
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showToast('🔗 摘要已複製到剪貼簿');
+        } catch (err) {
+            showToast('❌ 複製失敗');
+        }
+        document.body.removeChild(textArea);
+    }
+}
 
   function setupEvents() {
     const lineBtn = document.getElementById('btnOpenLine');
@@ -1659,6 +1715,12 @@
     const shareOverlay = document.getElementById('shareSheetOverlay');
     document.getElementById('shareSheetCancel').onclick = () => shareOverlay.classList.remove('active');
     shareOverlay.onclick = (e) => { if(e.target === shareOverlay) shareOverlay.classList.remove('active'); };
+
+    // 摘要彈窗專屬關閉功能
+    document.getElementById('btnSummaryClose').onclick = () => {
+      document.getElementById('summaryPopup').style.display = 'none';
+      stopTTS();
+    };
   }
 
   function esc(s) {

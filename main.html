@@ -1604,7 +1604,7 @@
       const shareContent = `【新聞摘要重點】\n${cleanText}\n\n閱讀全文：${url}`;
 
       if (platform === 'line') {
-          window.open(`https://social-plugins.line.me/lineit/share?url={url}&text={shareContent}`, '_blank');
+          window.open(`https://line.me/R/share?text=${encodeURIComponent(shareContent)}`, '_blank');
       } else if (platform === 'fb') {
           window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(shareContent)}`, '_blank');
       } else if (platform === 'x') {
