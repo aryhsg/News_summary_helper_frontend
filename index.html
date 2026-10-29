@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新聞摘要助手</title>
+<link rel="icon" href="nsh-logo3.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- Sidebar / category nav -->
+  <nav class="sidebar" id="sidebar" aria-label="分類">
+    <div class="masthead">
+      <img src="nsh-logo3.png" alt="" class="masthead-mark" aria-hidden="true">
+      <div class="masthead-text">
+        <div class="masthead-zh">新聞摘要助手</div>
+        <div class="masthead-en">News Summary Helper</div>
+      </div>
+    </div>
+    <div class="nav-scroll" id="navScroll">
+      <!-- category rows injected by app.js -->
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-heading">
+        <img src="nsh-logo3.png" alt="" class="title-mark" aria-hidden="true">
+        <h1 class="page-title" id="pageTitle">所有新聞</h1>
+      </div>
+
+      <div class="topbar-actions">
+        <label class="sandbox-toggle" title="切換成不會用掉 AI 配額的示範資料">
+          <input type="checkbox" id="sandboxToggle">
+          <span class="switch" aria-hidden="true"></span>
+          <span>示範模式</span>
+        </label>
+
+        <div class="search-box">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="searchInput" placeholder="搜尋標題或關鍵字" aria-label="搜尋新聞">
+        </div>
+
+        <button class="btn btn-outline" id="categorySummaryBtn" type="button" title="針對目前分類生成趨勢摘要">
+          生成分類摘要
+        </button>
+      </div>
+    </header>
+
+    <div id="statusBanner" class="status-banner" hidden></div>
+
+    <div class="content-scroll">
+      <div class="news-grid" id="newsGrid" aria-live="polite">
+        <!-- rows injected by app.js -->
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Article detail panel -->
+<div class="overlay" id="articleOverlay" hidden></div>
+<aside class="article-panel dialog" id="articlePanel" hidden aria-label="新聞詳情">
+  <header class="panel-header">
+    <span class="card-tag" id="articleCat">分類</span>
+    <button class="icon-btn" id="articleClose" aria-label="關閉">✕</button>
+  </header>
+  <div class="panel-body" id="articleBody">
+    <!-- article content injected by app.js -->
+  </div>
+</aside>
+
+<!-- Category summary modal -->
+<div class="overlay" id="categoryOverlay" hidden></div>
+<div class="modal dialog" id="categoryModal" hidden aria-label="分類趨勢摘要">
+  <header class="modal-header">
+    <h2 class="modal-title" id="categoryModalTitle">分類趨勢摘要</h2>
+    <button class="icon-btn" id="categoryClose" aria-label="關閉">✕</button>
+  </header>
+  <div class="modal-body" id="categoryModalBody">
+    <!-- category summary injected by app.js -->
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

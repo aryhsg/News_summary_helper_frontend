@@ -1,0 +1,658 @@
+/* ---------------------------------------------------------------------
+   News Summary Helper — frontend styles
+
+   Design concept: pulled directly from the brand mark — a flat, two-tone
+   "news tornado" (torn newsprint + confetti squares spiraling into a
+   funnel) in orange and sky blue on dark charcoal. The UI commits to
+   that same flat, energetic, two-tone poster language: a dark charcoal
+   base, zero drop shadows, color used as solid blocks rather than
+   gradients, and a torn-paper corner motif on every news card instead
+   of a uniform rounded-rect/shadow "card kit" treatment.
+
+   This is a deliberate single branded look, not an auto light/dark
+   toggle — the brand asset itself is charcoal + orange + blue, so that
+   combination is the product's identity, not a generic dark-mode default.
+   --------------------------------------------------------------------- */
+
+:root {
+  --charcoal: #202023;        /* page background, matches the logo lockup */
+  --charcoal-raised: #2B2B30; /* sidebar / card / panel surfaces */
+  --charcoal-sunk: #19191C;   /* inputs, thumbnail placeholders */
+  --ivory: #F5F2EC;           /* primary text — warm off-white, not stark white */
+  --ivory-dim: #A9A6A0;       /* secondary / meta text */
+  --rule: rgba(245, 242, 236, 0.1);
+
+  --orange: #F2651D;          /* signal color — sampled from the logo mark */
+  --orange-strong: #FF7F3F;
+  --orange-wash: rgba(242, 101, 29, 0.16);
+  --blue: #5BA3D9;            /* secondary brand color — the logo's sky blue */
+  --blue-strong: #7DBBE8;
+  --blue-wash: rgba(91, 163, 217, 0.16);
+  --danger: #E5484D;          /* kept visually distinct from orange on purpose,
+                                  so a real error never reads as a brand accent */
+  --danger-wash: rgba(229, 72, 77, 0.16);
+
+  --radius: 8px;
+  --font-display: 'Poppins', 'Noto Sans TC', sans-serif;
+  --font-ui: 'Inter', 'Noto Sans TC', sans-serif;
+  --font-body: 'Noto Sans TC', 'Inter', sans-serif;
+}
+
+* , *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--charcoal);
+  color: var(--ivory);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+button, input { font-family: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 6px; }
+
+/* ---------- layout shell ---------- */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--charcoal-raised);
+  border-right: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px;
+  background: var(--charcoal);
+  border-bottom: 1px solid var(--rule);
+}
+
+.masthead-mark {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.masthead-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.masthead-zh {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--ivory);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.masthead-en {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--ivory-dim);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.nav-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ivory-dim);
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+
+.nav-item:hover { color: var(--ivory); background: rgba(245, 242, 236, 0.05); }
+
+.nav-item.active {
+  color: var(--charcoal);
+  background: var(--orange);
+  font-weight: 700;
+}
+
+.nav-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ivory-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.nav-item.active .nav-count { color: var(--charcoal); opacity: 0.75; }
+
+.nav-divider {
+  margin: 14px 12px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ivory-dim);
+  opacity: 0.6;
+}
+
+/* ---------- main column ---------- */
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 18px;
+  flex-wrap: wrap;
+}
+
+.topbar-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* the one recurring brand touch: the compact mark sits beside every
+   section heading, like a stamp, instead of decorative chrome */
+.title-mark {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sandbox-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ivory-dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sandbox-toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+
+.switch {
+  width: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--charcoal-sunk);
+  border: 1px solid var(--rule);
+  position: relative;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--ivory-dim);
+  transition: transform 0.15s, background 0.15s;
+}
+
+.sandbox-toggle input:checked + .switch { background: var(--blue-wash); border-color: var(--blue); }
+.sandbox-toggle input:checked + .switch::after { transform: translateX(14px); background: var(--blue); }
+.sandbox-toggle input:focus-visible + .switch { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+.search-box {
+  position: relative;
+  width: 230px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 11px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--ivory-dim);
+  pointer-events: none;
+}
+
+.search-box input {
+  width: 100%;
+  background: var(--charcoal-sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 9px 12px 9px 32px;
+  font-size: 14px;
+  color: var(--ivory);
+  outline: none;
+  transition: border-color 0.12s;
+}
+
+.search-box input::placeholder { color: var(--ivory-dim); }
+.search-box input:focus { border-color: var(--orange); }
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: var(--radius);
+  padding: 9px 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-outline {
+  background: none;
+  border-color: var(--rule);
+  color: var(--ivory);
+}
+.btn-outline:hover:not(:disabled) { border-color: var(--orange); color: var(--orange); }
+
+.btn-primary {
+  background: var(--orange);
+  color: var(--charcoal);
+}
+.btn-primary:hover:not(:disabled) { background: var(--orange-strong); }
+
+/* ---------- status banner ---------- */
+
+.status-banner {
+  margin: 0 28px 16px;
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--danger-wash);
+  color: var(--danger);
+  border-left: 3px solid var(--danger);
+}
+
+/* ---------- news grid (card, not a dense ledger row) ---------- */
+
+.content-scroll {
+  flex: 1;
+  padding: 0 28px 40px;
+  overflow-y: auto;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/* Flat design, no shadows — mirrors the logo's flat vector illustration.
+   The asymmetric corner radius (sharp top-right / bottom-left, rounded
+   the other two) reads as a torn paper corner, the funnel icon's own
+   motif, instead of a uniform rounded rectangle. */
+.news-card {
+  background: var(--charcoal-raised);
+  border: 1px solid var(--rule);
+  border-radius: 4px 18px 4px 18px;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  transition: border-color 0.12s;
+}
+
+.news-card:hover { border-color: var(--orange); }
+
+.card-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/10;
+  background: var(--charcoal-sunk);
+  overflow: hidden;
+}
+
+.card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* the torn-newsprint corner flag — alternates orange/blue by position,
+   a deterministic rhythm (not random), echoing the clipped paper shards
+   spiraling through the logo mark */
+.card-flag {
+  position: absolute;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 30px 30px 0 0;
+  border-color: var(--orange) transparent transparent transparent;
+}
+
+.card-flag.is-blue { border-color: var(--blue) transparent transparent transparent; }
+
+.card-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+
+.card-title {
+  font-family: var(--font-body);
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ivory);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-tag {
+  display: inline-flex;
+  align-self: flex-start;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--charcoal);
+  background: var(--orange);
+  padding: 3px 10px;
+  border-radius: 3px 10px 3px 10px;
+}
+
+.card-tag.is-blue { background: var(--blue); }
+
+/* ---------- empty / loading states ---------- */
+
+.state-box {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 56px 20px;
+  color: var(--ivory-dim);
+  font-size: 14px;
+}
+
+.state-mark {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  opacity: 0.55;
+  margin-bottom: 14px;
+}
+
+.spinner {
+  width: 26px; height: 26px;
+  border: 3px solid var(--rule);
+  border-top-color: var(--orange);
+  border-right-color: var(--blue);
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- overlay (shared) ---------- */
+
+/* Translucent, slightly frosted backdrop — dims and softly blurs the page
+   behind the floating dialog, rather than a flat opaque scrim. */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(10, 10, 12, 0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 300;
+}
+
+/* ---------- floating dialog (shared by the article panel and the
+   category-summary modal — the one deliberate motion is this pop-in) ----------
+   Centered, frosted-glass surface: translucent charcoal + backdrop blur,
+   so it reads as floating above the dimmed page instead of a docked,
+   flat-opaque panel. This is the one place a shadow is allowed, since
+   "floating" is the explicit goal here — everything else in the UI
+   (cards, nav, buttons) stays flat and shadow-free as before. */
+.dialog {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 310;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: rgba(43, 43, 48, 0.82);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(245, 242, 236, 0.14);
+  border-radius: 4px 18px 4px 18px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  animation: dialog-in 0.18s ease-out;
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.article-panel.dialog {
+  width: min(600px, calc(100% - 32px));
+  max-height: min(82vh, 760px);
+  border-top: 3px solid var(--orange);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 32px; height: 32px;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: none;
+  color: var(--ivory);
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.icon-btn:hover { background: var(--orange); color: var(--charcoal); border-color: var(--orange); }
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 32px;
+}
+
+.article-img {
+  width: calc(100% + 48px);
+  margin: 0 -24px 20px;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+  background: var(--charcoal-sunk);
+}
+
+.article-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 18px;
+  color: var(--ivory);
+}
+
+.article-content {
+  font-size: 16px;
+  line-height: 1.85;
+  color: var(--ivory);
+}
+
+.article-content p { margin: 0 0 16px; text-align: justify; }
+
+.summary-section {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+
+.summary-box {
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: var(--charcoal-sunk);
+  border-left: 3px solid var(--orange);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--ivory);
+}
+
+.summary-box ol.modern-list,
+.summary-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.summary-box ol.modern-list li, .summary-box ul li { margin-bottom: 10px; }
+.summary-box h2, .summary-box h3 { margin: 0 0 10px; font-family: var(--font-display); color: var(--ivory); }
+.summary-box p { margin: 0 0 12px; }
+.summary-box p:last-child { margin-bottom: 0; }
+
+.summary-empty-note {
+  font-style: italic;
+  color: var(--ivory-dim);
+  margin: 0;
+}
+
+/* ---------- category summary modal (sizing/accent only — shared
+   centered/frosted treatment lives on .dialog above) ---------- */
+
+.modal.dialog {
+  width: min(620px, calc(100% - 32px));
+  max-height: min(660px, calc(100% - 64px));
+  border-top: 3px solid var(--blue);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ivory);
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 24px 28px;
+  font-size: 15px;
+  line-height: 1.85;
+  color: var(--ivory);
+}
+
+.modal-body h2, .modal-body h3 { font-family: var(--font-display); margin: 18px 0 10px; color: var(--ivory); }
+.modal-body h2:first-child, .modal-body h3:first-child { margin-top: 0; }
+.modal-body p { margin: 0 0 14px; }
+
+/* ---------- toast ---------- */
+
+.toast {
+  position: fixed;
+  bottom: 22px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: var(--ivory);
+  color: var(--charcoal);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s, transform 0.18s;
+}
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 860px) {
+  .app-shell { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--rule);
+  }
+  .masthead { justify-content: center; padding: 16px; }
+  .nav-scroll {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 10px 14px 14px;
+  }
+  .nav-item { flex-shrink: 0; }
+  .nav-divider { display: none; }
+  .topbar { padding: 16px; }
+  .search-box { width: 100%; }
+  .content-scroll { padding: 0 14px 32px; }
+  .dialog { max-height: min(88vh, 760px); }
+}
