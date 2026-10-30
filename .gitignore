@@ -1,0 +1,3 @@
+# config.js 含真實的 API_KEY，不進版本控制，避免密鑰被 commit 進 git 歷史。
+# config.js 本身仍然要存在於硬碟上（nginx 直接讀檔案服務），只是不追蹤它的內容變化。
+config.js
