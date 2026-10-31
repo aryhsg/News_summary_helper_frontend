@@ -94,6 +94,7 @@ function init() {
 
 function wireEvents() {
   document.getElementById("searchInput").addEventListener("input", onSearchInput);
+  document.getElementById("searchInput").addEventListener("compositionend", onSearchInput);
   document.getElementById("categorySummaryBtn").addEventListener("click", onCategorySummaryClick);
   document.getElementById("articleClose").addEventListener("click", closeArticlePanel);
   document.getElementById("articleOverlay").addEventListener("click", closeArticlePanel);
@@ -180,10 +181,18 @@ async function loadNewsList() {
   }
 }
 
+// 防抖時間。打中文時字與字之間要按好幾個鍵再選字，停頓很容易超過 350ms，
+// 每個字都會被當成「已經停下來」而各送一次請求，所以放寬到 500ms。
+const SEARCH_DEBOUNCE_MS = 500;
+
 function onSearchInput(e) {
+  // 輸入法組字中（例如注音還沒選字）輸入框裡是 ㄨㄟˋ 這種暫時的字，不是使用者
+  // 要搜尋的內容，不能拿去查，否則每個字都會多送出注音符號的請求並讓畫面閃一下。
+  // 組字結束時瀏覽器會觸發 compositionend，由它再呼叫一次（見 wireEvents）。
+  if (e.isComposing) return;
   state.searchQuery = e.target.value.trim();
   clearTimeout(state.searchDebounceTimer);
-  state.searchDebounceTimer = setTimeout(() => applyFiltersAndRender(), 350);
+  state.searchDebounceTimer = setTimeout(() => applyFiltersAndRender(), SEARCH_DEBOUNCE_MS);
 }
 
 async function applyFiltersAndRender() {
