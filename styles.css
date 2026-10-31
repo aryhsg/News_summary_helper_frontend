@@ -354,6 +354,8 @@ button, input { font-family: inherit; }
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  /* 一長串沒有空白的英文或網址不會自動換行，會撐破卡片寬度 */
+  overflow-wrap: anywhere;
 }
 
 .card-tag {

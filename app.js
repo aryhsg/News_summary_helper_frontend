@@ -50,15 +50,18 @@ async function apiRequest(path, options = {}) {
       },
     });
   } catch (networkErr) {
-    throw new ApiError(
-      "network",
-      "無法連線到後端伺服器。請確認 API_BASE 設定正確、後端是否正在執行；" +
-      "若是在本機用不同連接埠開啟本頁與後端，瀏覽器可能因為沒有設定 CORS 而擋下請求（這是後端設定的問題，不是這個前端的 bug）。"
+    // 給開發者的排查提示只寫進 console，畫面上只顯示一般使用者看得懂的訊息。
+    console.error(
+      "[apiRequest] 連線失敗：請確認 config.js 的 API_BASE 設定正確、後端是否正在執行；" +
+      "若是在本機用不同連接埠開啟本頁與後端，瀏覽器可能因為沒有設定 CORS 而擋下請求。",
+      networkErr
     );
+    throw new ApiError("network", "無法連線到後端伺服器，請檢查網路連線後再試一次。");
   }
 
   if (res.status === 403) {
-    throw new ApiError("auth", "API 金鑰驗證失敗，請確認 config.js 裡的 API_KEY 是否填寫正確。");
+    console.error("[apiRequest] 403：請確認 config.js 裡的 API_KEY 與後端的 INTERNAL_API_KEY 一致。");
+    throw new ApiError("auth", "API 金鑰驗證失敗，請重新整理頁面後再試；若持續發生請聯絡管理員。");
   }
   if (res.status === 404) {
     let detail = "找不到資料。";
@@ -373,7 +376,11 @@ async function openCategoryModal(category) {
 
   try {
     const result = await apiRequest(`/api/news/summary/${encodeURIComponent(category)}`, { method: "POST" });
-    state.categorySummaryCache.set(category, result.summary);
+    // 「尚無摘要」不快取：之後後端產生了，同一個頁面再按一次就要看得到。
+    // 這個端點只是對主鍵查一筆資料，每次重新請求的成本很低。
+    if (result.summary !== "該類別尚無摘要") {
+      state.categorySummaryCache.set(category, result.summary);
+    }
     renderCategorySummaryResult(category, result.summary);
   } catch (err) {
     body.innerHTML = `<div class="state-box">${escapeHtml(err.message)}</div>`;
