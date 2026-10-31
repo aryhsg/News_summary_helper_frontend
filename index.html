@@ -36,12 +36,6 @@
       </div>
 
       <div class="topbar-actions">
-        <label class="sandbox-toggle" title="切換成不會用掉 AI 配額的示範資料">
-          <input type="checkbox" id="sandboxToggle">
-          <span class="switch" aria-hidden="true"></span>
-          <span>示範模式</span>
-        </label>
-
         <div class="search-box">
           <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" id="searchInput" placeholder="搜尋標題或關鍵字" aria-label="搜尋新聞">
@@ -90,6 +84,8 @@
 <!-- Toast -->
 <div class="toast" id="toast" role="status"></div>
 
+<!-- DOMPurify 3.4.17（cdnjs 官方檔案，sha512 已與官方公布值比對）。先載入，app.js 才能用它清理外部內容 -->
+<script src="vendor/purify.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
